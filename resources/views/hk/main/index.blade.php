@@ -1,7 +1,7 @@
-@extends('hk.site.layouts.main.app', [
+{{-- @extends('hk.site.layouts.main.app', [
     'menu' => 'internal',
-])
-@section('content')
+]) --}}
+{{-- @section('content') --}}
     <!-- Hero Section -->
     <div class="container my-5">
         <div class="row text-center mb-2">
@@ -173,4 +173,4 @@
         
     </div>
 
-@endsection
+{{-- @endsection --}}

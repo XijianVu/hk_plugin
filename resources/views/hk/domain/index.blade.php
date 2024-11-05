@@ -1,8 +1,8 @@
-@extends('hk.site.layouts.main.app', [
+{{-- @extends('hk.site.layouts.main.app', [
     'menu' => 'internal',
-])
+]) --}}
 
-@section('content')
+{{-- @section('content') --}}
 <div class="container my-5">
     <div class="row text-center mb-5">
         <div class="col-md-12 mb-5">
@@ -378,4 +378,4 @@
         </div>
     </div>
 </div>
-@endsection
+{{-- @endsection --}}

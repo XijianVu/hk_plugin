@@ -1,7 +1,7 @@
-@extends('hk.site.layouts.main.app', [
+{{-- @extends('hk.site.layouts.main.app', [
     'menu' => 'internal',
 ])
-@section('content')
+@section('content') --}}
 <style>
     .font-weight-light {
         font-weight: 300; 
@@ -38,10 +38,10 @@
             <div class="card shadow-sm h-100">
                 <div class="card-body">
                     <h3 class="card-title">Wordpress VIP</h3>
-                    <p class="card-text">Quản trị toàn diện</p>
+                    <p class="card-text text-center">Quản trị toàn diện</p>
                     <h6 class="text-muted">Chỉ từ</h6>
                     <h3 class="text-primary font-weight-bold">381.000₫</h3>
-                    <p class="text-muted">/tháng</p>
+                    <p class="text-muted text-center">/tháng</p>
                     <small>Tiết kiệm 15% với gói hàng năm</small>
                     <a href="#" class="btn btn-dark mt-3">Xem các gói</a>
                 </div>
@@ -53,10 +53,10 @@
             <div class="card shadow-sm h-100">
                 <div class="card-body">
                     <h3 class="card-title">SEO</h3>
-                    <p class="card-text">Tốt cho SEO</p>
+                    <p class="card-text text-center">Tốt cho SEO</p>
                     <h6 class="text-muted">Chỉ từ</h6>
                     <h3 class="text-primary font-weight-bold">142.000₫</h3>
-                    <p class="text-muted">/tháng</p>
+                    <p class="text-muted text-center">/tháng</p>
                     <small>Tiết kiệm 15% với gói hàng năm</small>
                     <a href="#" class="btn btn-dark mt-3">Xem các gói</a>
                 </div>
@@ -68,10 +68,10 @@
             <div class="card shadow-sm h-100">
                 <div class="card-body">
                     <h3 class="card-title">Nodejs</h3>
-                    <p class="card-text">Truy cập web dễ dàng</p>
+                    <p class="card-text text-center">Truy cập web dễ dàng</p>
                     <h6 class="text-muted">Chỉ từ</h6>
                     <h3 class="text-primary font-weight-bold">74.000₫</h3>
-                    <p class="text-muted">/tháng</p>
+                    <p class="text-muted text-center">/tháng</p>
                     <small>Tiết kiệm 25% với gói hàng năm</small>
                     <a href="#" class="btn btn-dark mt-3">Xem các gói</a>
                 </div>
@@ -84,9 +84,9 @@
                 <div class="card-body">
                     <h3 class="card-title">Python</h3>
                     <p class="card-text">Nền tảng lập trình ứng dụng</p>
-                    <h6 class="text-muted">Chỉ từ</h6>
+                    <h6 class="text-muted text-center">Chỉ từ</h6>
                     <h3 class="text-primary font-weight-bold">122.000₫</h3>
-                    <p class="text-muted">/tháng</p>
+                    <p class="text-muted text-center">/tháng</p>
                     <small>Tiết kiệm 15% với gói hàng năm</small>
                     <a href="#" class="btn btn-dark mt-3">Xem các gói</a>
                 </div>
@@ -113,21 +113,23 @@
         <div class="col-md-6">
             <div class="card p-4 shadow-lg">
                 <h3 class="mb-4">Vui lòng điền thông tin của bạn để được tư vấn miễn phí</h3>
-                <form>
+                <form method="POST" action="<?php echo esc_url(get_site_url()); ?>?page=hk&path=/hosting">
+                    @csrf
                     <div class="form-group">
                         <label for="name">Họ tên:</label>
-                        <input type="text" class="form-control" id="name" placeholder="Nhập họ tên">
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Nhập họ tên" required>
                     </div>
                     <div class="form-group">
                         <label for="phone">SĐT:</label>
-                        <input type="text" class="form-control" id="phone" placeholder="Nhập số điện thoại">
+                        <input type="text" class="form-control" id="phone" name="phone" placeholder="Nhập số điện thoại" required>
                     </div>
                     <div class="form-group">
                         <label for="email">Email:</label>
-                        <input type="email" class="form-control" id="email" placeholder="Nhập email">
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Nhập email" required>
                     </div>
                     <button type="submit" class="btn btn-danger btn-block font-weight-bold">Tư Vấn Cho Tôi</button>
                 </form>
+                
             </div>
         </div>
     </div>
@@ -136,4 +138,4 @@
 <script>
 
     </script>
-@endsection
+{{-- @endsection --}}
