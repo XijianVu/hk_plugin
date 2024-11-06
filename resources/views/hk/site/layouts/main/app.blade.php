@@ -7,8 +7,6 @@
     <title>Document</title>
 
     <link rel='stylesheet' id='bootstrap-css' href='https://hoangkhang.com.vn/wp-content/themes/tanda/css/bootstrap.min.css?ver=6.4.3' media='all'/>
-    
-    <!-- Include jQuery -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
     <style>
@@ -40,13 +38,5 @@
 </head>
 <body>
     @yield('content')
-
-    <!-- You can add your custom scripts here -->
-    <script>
-        $(document).ready(function() {
-            // Your jQuery code here
-            console.log("jQuery is ready!");
-        });
-    </script>
 </body>
 </html>

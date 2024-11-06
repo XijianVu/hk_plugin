@@ -4,7 +4,7 @@ namespace App\Http\Controllers\hk;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Domain;
+use App\Helpers\Functions;
 
 class DomainController extends Controller
 {
@@ -16,29 +16,37 @@ class DomainController extends Controller
     public function searchDomain(Request $request)
     {
         // Trimming và kiểm tra tên miền
-        $value = trim($request->input('value'));
+        $domain = trim($request->input('value'));
     
-        // Kiểm tra xem $value có hợp lệ hay không
-        if (empty($value)) {
+        if (!Functions::isValidDomainFormat($domain)) {
             return response()->json([
-                'message' => "Tên miền không hợp lệ!",
+                'message' => "Tên miền chưa hợp lệ!",
                 'status' => 400
             ], 400);
         }
     
-        // Kiểm tra tên miền đã tồn tại hay chưa
-        $isDomainExisting = Domain::checkDomainIsExisting($value);
+        $isDomainAvailable = Functions::isDomainAvailable($domain);
     
-        if ($isDomainExisting) {
+        if (!$isDomainAvailable) {
             return response()->json([
                 'message' => "Domain đã tồn tại!",
-                'status' => 409 // 409 Conflict
+                'status' => 409 // Conflict
             ], 409);
         }
     
         return response()->json([
             'message' => "Domain hợp lệ!",
             'status' => 200
+        ], 200);
+    }
+
+    public function suggestDomain(Request $request) 
+    {
+        $searchValue = $request->searchValue;
+        $suggestDomains = Functions::getSuggestDomains($searchValue);
+
+        return response()->view('hk.domain.suggest_domains', [
+            'domains' => $suggestDomains
         ], 200);
     }
 }

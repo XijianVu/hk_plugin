@@ -3,27 +3,47 @@
 ]) --}}
 
 {{-- @section('content') --}}
-<div class="container my-5">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<style>
+    .spinner {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #3498db;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
+<div data-container="domain-manager" class="container my-5">
     <div class="row text-center mb-5">
-        <div class="col-md-12 mb-5">
+        <div class="col-md-12 mb-2">
             <h2 class="display-5 text-primary text-uppercase fw-bold letter-spacing">Kiểm Tra Và Đăng Ký Tên Miền Ngay Hôm Nay</h2>
-            <p class="text-muted fs-5 fst-italic mb-0">Tìm tên miền hoàn hảo cho doanh nghiệp hoặc thương hiệu cá nhân của bạn</p>
+            <p class="text-muted fs-5 fst-italic mb-0 text-center">Tìm tên miền hoàn hảo cho doanh nghiệp hoặc thương hiệu cá nhân của bạn</p>
         </div>
 
-        <div class="col-md-8 mx-auto" data-form="search-domain">
+        <div class="col-md-8 mx-auto" data-form="search-domain" data-url="<?php echo esc_url(get_site_url()); ?>?page=hk&path=/hk/search-domain">
+            @csrf
             <div class="row py-3">
                 <div class="col-md-12">
                     <input type="search" data-action="search-input" class="form-control py-4" placeholder="Nhập tên miền bạn cần tại đây" />
                 </div>
             </div>
 
-            <div data-form="validation">
+            <div data-form="validation" class="mb-3">
                 {{-- VALID --}}
                 <div data-control="valid-form" class="">
                     <span class="fw-bold text-success">Tuyệt vời! Bạn có thể đăng ký với tên miền này</span>
                     <div class="row d-flex justify-content-between mt-3 align-items-center">
                         <div class="col-md-3">
-                            <span style="font-weight: bold">phanhoanganh.net</span>
+                            <span data-control="available-domain" style="font-weight: bold">#N/A</span>
                         </div>
                         
                         <div class="col-md-3">
@@ -60,62 +80,14 @@
                     }
                 </style>
 
-                <div class="mt-2">
+                <div data-form="suggest-domains" data-action="<?php echo esc_url(get_site_url()); ?>?page=hk&path=/hk/suggest-domains" class="mt-2">
                     <div class="row mb-3">
-                        <span class="fw-bold text-dark fs-3" style="font-weight: bold">Gợi ý dành cho bạn:</span>
-                    </div>
+                        <div class="col-md-12 col-12 mb-3">
+                            <span class="fw-bold text-dark fs-3" style="font-weight: bold">Gợi ý dành cho bạn:</span>
+                        </div>
 
-                    <div class="row d-flex justify-content-between my-auto align-items-center row-separator">
-                        <div class="col-md-3">
-                            <span style="font-weight: bold">phanhoanganh.net</span>
-                        </div>
-                        
-                        <div class="col-md-3">
-                            <span>1 năm</span>
-                        </div>
-                
-                        <div class="col-md-3">
-                            <span>249.000 vnđ</span>
-                        </div>
-                
-                        <div class="col-md-3">
-                            <button class="btn btn-info">Chọn mua</button>
-                        </div>
-                    </div>
-                
-                    <div class="row d-flex justify-content-between my-auto align-items-center row-separator">
-                        <div class="col-md-3">
-                            <span style="font-weight: bold">exampledomain.com</span>
-                        </div>
-                        
-                        <div class="col-md-3">
-                            <span>2 năm</span>
-                        </div>
-                
-                        <div class="col-md-3">
-                            <span>299.000 vnđ</span>
-                        </div>
-                
-                        <div class="col-md-3">
-                            <button class="btn btn-info">Chọn mua</button>
-                        </div>
-                    </div>
-                
-                    <div class="row d-flex justify-content-between my-auto align-items-center row-separator">
-                        <div class="col-md-3">
-                            <span style="font-weight: bold">anotherdomain.com</span>
-                        </div>
-                        
-                        <div class="col-md-3">
-                            <span>3 năm</span>
-                        </div>
-                
-                        <div class="col-md-3">
-                            <span>399.000 vnđ</span>
-                        </div>
-                
-                        <div class="col-md-3">
-                            <button class="btn btn-info">Chọn mua</button>
+                        <div data-form="items-box" class="col-md-12 col-12">
+                            
                         </div>
                     </div>
                 </div>
@@ -124,10 +96,29 @@
 
         <script>
             $(() => {
-                new DomainSearchManager({
-                    container: $('[data-form="search-domain"]')
-                });
+                new DomainManager({
+                    container: $('[data-container="domain-manager"]')
+                })
             });
+
+            var DomainManager = class {
+                constructor(options) {
+                    this.container = options.container;
+                    this.searchManager = new DomainSearchManager({
+                        container: $('[data-form="search-domain"]'),
+                        manager: this
+                    });
+                    this.suggestBox = new SuggestBox({
+                        container: $('[data-form="suggest-domains"]'),
+                        manager: this
+                    });
+                }
+
+                handleSuggest() {
+                    const searchValue = this.searchManager.getSearchValue();
+                    this.suggestBox.suggest(searchValue);
+                }
+            }
 
             var ValidationBox = class {
                 constructor(options) {
@@ -171,14 +162,24 @@
                     this.getInvalidForm().show();
                 }
 
-                handleValid() {
+                handleValid(availableDomain) {
+                    this.setAvailableDomain(availableDomain);
                     this.hideInvalidForm();
                     this.showValidForm();
                 }
 
                 handleInvalid() {
+                    this.setAvailableDomain(null);
                     this.hideValidForm();
                     this.showInValidForm();
+                }
+
+                getAvailabledDomainSpan() {
+                    return this.container.find('[data-control="available-domain"]');
+                }
+
+                setAvailableDomain(availableDomain) {
+                    this.getAvailabledDomainSpan().html(availableDomain);
                 }
             }
         
@@ -188,9 +189,13 @@
                     this.validationBox = new ValidationBox({
                         container: $('[data-form="validation"]')
                     });
+                    this.manager = options.manager;
 
-                    this.validationBox.hideAll();
-                    this.events();
+                    this.init();
+                }
+
+                getSearchUrl() {
+                    return this.container.attr('data-url')
                 }
 
                 getSearchInput() {
@@ -209,26 +214,34 @@
                     };
                 }
 
+                init() {
+                    this.validationBox.hideAll();
+                    this.events();
+                }
+
                 search() {
                     const value = this.getSearchValue();
+                    const url = this.getSearchUrl();
 
                     if (value == "") {
                         this.validationBox.setErrorText("")
                         this.validationBox.hideAll();
                     } else {
                         $.ajax({
-                            url: "{{ action([App\Http\Controllers\Hk\DomainController::class, 'searchDomain']) }}",
+                            url: url,
                             method: "POST",
                             data: {
                                 _token: "{{ csrf_token() }}",
                                 value: value
                             }
-                        }).done(res => {    
-                            this.validationBox.handleValid();
+                        }).done(res => {
+                            this.validationBox.handleValid(value);
                         }).fail(res => {
                             const errorText = JSON.parse(res.responseText).message;
                             this.validationBox.setErrorText(errorText)
                             this.validationBox.handleInvalid();
+                        }).always(() => {
+                            this.manager.handleSuggest(value);
                         })
                     }
                 }
@@ -240,9 +253,62 @@
         
                     this.getSearchInput().on('input', e => {
                         e.preventDefault();
+
+                        this.validationBox.hideAll()
+
                         const value = this.getSearchValue();
+
                         debouncedLog(value);
                     });
+                }
+            }
+
+            var SuggestBox = class {
+                constructor(options) {
+                    this.container = options.container;
+                    this.manager = options.manager;
+
+                    this.suggest();
+                }
+
+                getItemsBox() {
+                    return this.container.find('[data-form="items-box"]');
+                }
+
+                getSuggestUrl() {
+                    return this.container.attr('data-action');
+                }
+
+                addSpinner() {
+                    this.getItemsBox().html(
+                        `
+                            <div class="spinner m-auto"></div>
+                        `
+                    );
+                }
+
+                removeSpinner() {
+                    this.getItemsBox().find('.spinner').remove();
+                }
+                
+                suggest(searchValue = null) {
+                    const url = this.getSuggestUrl();
+
+                    this.addSpinner();
+
+                    $.ajax({
+                        url: url,
+                        method: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            searchValue: searchValue
+                        }
+                    }).done(res => {
+                        this.removeSpinner();
+                        this.getItemsBox().html(res);
+                    }).fail(res => {
+                        console.error(res);
+                    })
                 }
             }
         </script>
