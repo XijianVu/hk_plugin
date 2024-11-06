@@ -75,7 +75,7 @@ Route::middleware('guest')->group(function () {
 
 
     // Hosting
-    Route::get('hk/hosting', [HostingController::class, 'index']); 
+    Route::get('/hosting', [HostingController::class, 'index']); 
     Route::post('/hosting', [HostingController::class, 'store']);
 
 
