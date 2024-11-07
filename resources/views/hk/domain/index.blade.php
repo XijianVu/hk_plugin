@@ -10,6 +10,67 @@
         animation: spin 1s linear infinite;
     }
 
+    form {
+        margin: auto;
+    }
+
+    .form-group label {
+        color: #333;
+    }
+
+    .input-group-text {
+        font-weight: 500;
+        color: #777;
+    }
+
+    .form-control {
+        padding: 0.75
+        font-size: 1rem;rem 1.25rem;
+        font-size: 1rem;
+        border-radius: 8px;
+    }
+
+    .form-control:focus {
+        background-color: #f3f3f3;
+        border-color: #80bdff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+    }
+
+    /* .btn-success {
+        padding: 0.75rem 0;
+        font-size: 1.2rem;
+        font-weight: bold;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    } */
+
+    .btn-success:hover {
+        background-color: #28a745cc;
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+
+    body {
+        background: #f5f5f5
+    }
+    
+    .rounded {
+        border-radius: 1rem
+    }
+    
+    .nav-pills .nav-link { 
+        color: #555
+    } 
+    .nav-pills .nav-link.active {
+        color: white
+    }
+    
+    input[type="radio"] {
+        margin-right: 5px
+    }
+    
+    .bold {
+        font-weight:bold
+    }
+
     @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
@@ -23,85 +84,22 @@
             <p class="text-muted fs-5 fst-italic mb-0 text-center">Tìm tên miền hoàn hảo cho doanh nghiệp hoặc thương hiệu cá nhân của bạn</p>
         </div>
 
-        <style>
-            form {
-                margin: auto;
-            }
-
-            .form-group label {
-                color: #333;
-            }
-
-            .input-group-text {
-                font-weight: 500;
-                color: #777;
-            }
-
-            .form-control {
-                padding: 0.75
-                font-size: 1rem;rem 1.25rem;
-                font-size: 1rem;
-                border-radius: 8px;
-            }
-
-            .form-control:focus {
-                background-color: #f3f3f3;
-                border-color: #80bdff;
-                box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
-            }
-
-            .btn-success {
-                padding: 0.75rem 0;
-                font-size: 1.2rem;
-                font-weight: bold;
-                transition: background-color 0.3s ease, box-shadow 0.3s ease;
-            }
-
-            .btn-success:hover {
-                background-color: #28a745cc;
-                box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-            }
-
-            body {
-                background: #f5f5f5
-            }
-            
-            .rounded {
-                border-radius: 1rem
-            }
-            
-            .nav-pills .nav-link { 
-                color: #555
-            } 
-            .nav-pills .nav-link.active {
-                color: white
-            }
-            
-            input[type="radio"] {
-                margin-right: 5px
-            }
-            
-            .bold {
-                font-weight:bold
-            }
-        </style>
-        
-        <!-- The Modal -->
+        <!-- Modal -->
         <div class="modal" id="register-modal">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
-                    <!-- Modal Header -->
+                    <!-- Header -->
                     <div class="modal-header">
                         <h4 data-control="modal-heading" class="modal-title">Modal Heading</h4>
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
                     </div>
         
-                    <!-- Modal body -->
+                    <!-- body -->
                     <div class="modal-body" data-control="modal-body">
                         
                     </div>
         
-                    <!-- Modal footer -->
+                    <!-- footer -->
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger" data-dismiss="modal">Đóng</button>
                     </div>
@@ -123,7 +121,7 @@
                     <span class="fw-bold text-success">Tuyệt vời! Bạn có thể đăng ký với tên miền này</span>
                     <div class="row d-flex justify-content-between mt-3 align-items-center">
                         <div class="col-md-3">
-                            <span data-control="available-domain" style="font-weight: bold">#N/A</span>
+                            <span data-control="available-domain-name" style="font-weight: bold">#N/A</span>
                         </div>
                         
                         <div class="col-md-3">
@@ -131,11 +129,11 @@
                         </div>
                 
                         <div class="col-md-3">
-                            <span>249.000 vnđ</span>
+                            <span data-control="available-domain-price">249.000 vnđ</span>
                         </div>
                 
                         <div class="col-md-3">
-                            <button class="btn btn-success">Chọn mua</button>
+                            <button data-action="by-available-domain" class="btn btn-success">Chọn mua</button>
                         </div>
                     </div>
                 </div>
@@ -240,6 +238,8 @@
             var ValidationBox = class {
                 constructor(options) {
                     this.container = options.container;
+
+                    this.events();
                 }
 
                 hideAll() {
@@ -291,12 +291,174 @@
                     this.showInValidForm();
                 }
 
+                formatPrice(priceString) {
+                    const priceNumber = priceString.replace(/\D/g, ''); 
+                    const formattedPrice = Number(priceNumber).toLocaleString('en-US'); 
+
+                    return formattedPrice;
+                }
+
                 getAvailabledDomainSpan() {
-                    return this.container.find('[data-control="available-domain"]');
+                    return this.container.find('[data-control="available-domain-name"]');
+                }
+
+                getAvailableDomainName() {
+                    return this.getAvailabledDomainSpan().html();
+                }
+
+                getAvailableDomainPrice() {
+                    return this.container.find('[data-control="available-domain-price"]').html();
+                }
+
+                getBuyBtn() {
+                    return this.container.find('[data-action="by-available-domain"]');
                 }
 
                 setAvailableDomain(availableDomain) {
                     this.getAvailabledDomainSpan().html(availableDomain);
+                }
+
+                setupModalBody() {
+                    const name = this.getAvailableDomainName();
+                    const price = this.getAvailableDomainPrice();
+                    const formatedPrice = this.formatPrice(price);
+
+                    return `
+                        <form action="" class="p-4 rounded shadow-sm bg-light w-100">
+                            <style>
+                                .mobile-text {
+                                    color: #989696b8;
+                                    font-size: 15px;
+                                }
+
+                                .form-control {
+                                    margin-right: 12px;
+                                }
+
+                                .cursor {
+                                    cursor: pointer;
+                                }
+                            </style>
+                            <div class="d-flex justify-content-center align-items-center container">
+                                <div class="px-3">
+                                    <h2 class="m-0 mb-2 text-bold">${name}</h2><span class="mobile-text">Sở hữu tên miền <u><b class="text-danger">${name}</b></u> với <b class="text-danger">${formatedPrice} VNĐ</b>/Năm đầu tiên</span>
+                                </div>
+                            </div>
+
+                            <div class="text-center">
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-lg-12 w-100 mx-auto">
+                                            <div class="">
+                                                <div class="">
+                                                    <div class="pt-4 pl-2 pr-2 pb-2">
+                                                        <!-- Credit card form tabs -->
+                                                        <ul role="tablist" class="nav bg-light nav-pills rounded nav-fill mb-3">
+                                                            <li class="nav-item"> <a data-toggle="pill" href="#credit-card" class="nav-link active "> <i class="fas fa-credit-card mr-2"></i> Credit Card </a> </li>
+                                                            <li class="nav-item"> <a data-toggle="pill" href="#paypal" class="nav-link "> <i class="fab fa-paypal mr-2"></i> Paypal </a> </li>
+                                                            <li class="nav-item"> <a data-toggle="pill" href="#net-banking" class="nav-link "> <i class="fas fa-mobile-alt mr-2"></i> Net Banking </a> </li>
+                                                        </ul>
+                                                    </div>
+
+                                                    <div class="tab-content">
+                                                        <div id="credit-card" class="tab-pane fade show active pt-3">
+                                                            <form role="form" onsubmit="event.preventDefault()">
+                                                                <div class="form-group"> 
+                                                                    <label class="ms-0" for="username">
+                                                                        <h5 class="text-bold">Chủ Thẻ</h5>
+                                                                    </label> 
+                                                                    <input type="text" name="username" placeholder="Tên chủ thẻ" required class="form-control "> 
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="ms-0" for="cardNumber">
+                                                                        <h5 class="text-bold">Số Thẻ</h5>
+                                                                    </label>
+                                                                    <div class="input-group"> 
+                                                                        <input type="text" name="cardNumber" placeholder="Số thẻ hợp lệ" class="form-control " required>
+                                                                        <div class="input-group-append">
+                                                                            <span class="input-group-text text-muted">
+                                                                                <i class="fab fa-cc-visa mx-1"></i>
+                                                                                <i class="fab fa-cc-mastercard mx-1"></i>
+                                                                                <i class="fab fa-cc-amex mx-1"></i>
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-sm-8">
+                                                                        <div class="form-group"> <label><span class="hidden-xs">
+                                                                                    <h5 class="text-bold">Expiration Date</h5>
+                                                                                </span></label>
+                                                                            <div class="input-group"> <input type="number" placeholder="MM" name="" class="form-control" required> <input type="number" placeholder="YY" name="" class="form-control" required> </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-sm-4">
+                                                                        <div class="form-group mb-4"> <label data-toggle="tooltip" title="Three digit CV code on the back of your card">
+                                                                                <h5 class="text-bold">CVV <i class="fa fa-question-circle d-inline"></i></h5>
+                                                                            </label> <input type="text" required class="form-control"> </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="footer"> <button type="button" class="subscribe btn btn-primary btn-block shadow-sm">Xác nhận thanh toán</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+
+                                                    <div id="paypal" class="tab-pane fade pt-3">
+                                                        <h6 class="pb-2">Chọn loại tài khoản PayPal của bạn</h6>
+                                                        <div class="form-group">
+                                                            <div class="custom-control custom-radio custom-control-inline">
+                                                                <input type="radio" id="domestic" name="optradio" class="custom-control-input" checked>
+                                                                <label class="custom-control-label" for="domestic">Domestic</label>
+                                                            </div>
+                                                            <div class="custom-control custom-radio custom-control-inline">
+                                                                <input type="radio" id="international" name="optradio" class="custom-control-input">
+                                                                <label class="custom-control-label" for="international">International</label>
+                                                            </div>
+                                                        </div>
+                                                        <p>
+                                                            <button type="button" class="btn btn-primary">
+                                                                <i class="fab fa-paypal mr-2"></i>Đăng nhập vào Paypal
+                                                            </button>
+                                                        </p>
+                                                        <p class="text-muted">
+                                                            Lưu ý: Sau khi nhấp vào nút, bạn sẽ được chuyển đến cổng thanh toán bảo mật. Sau khi hoàn tất quá trình thanh toán, bạn sẽ được chuyển lại về trang web để xem chi tiết đơn hàng của mình.
+                                                        </p>
+                                                    </div>
+
+                                                    <!-- bank transfer info -->
+                                                    <div id="net-banking" class="tab-pane fade pt-3">
+                                                        <div class="form-group "> <label for="Tài khoản ngân hàng">
+                                                                <h6>Chọn ngân hàng</h6>
+                                                            </label> <select class="form-control" id="ccmonth">
+                                                                <option value="" selected disabled>--Chọn ngân hàng của bạn--</option>
+                                                                <option>Vietinbank</option>
+                                                                <option>Vietcombank</option>
+                                                                <option>Techcombank</option>
+                                                                <option>Agribank</option>
+                                                            </select> </div>
+                                                        <div class="form-group">
+                                                            <p> <button type="button" class="btn btn-primary "><i class="fas fa-mobile-alt mr-2"></i>Tiến hành thanh toán</button> </p>
+                                                        </div>
+                                                        <p class="text-muted">Lưu ý: Sau khi nhấp vào nút, bạn sẽ được chuyển đến cổng thanh toán bảo mật. Sau khi hoàn tất quá trình thanh toán, bạn sẽ được chuyển lại về trang web để xem chi tiết đơn hàng của mình.</p>
+                                                    </div> <!-- End -->
+                                                    <!-- End -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                            </div>
+                        </form>
+                    `
+                }
+
+                events() {
+                    this.getBuyBtn().on('click', e => {
+                        e.preventDefault();
+
+                        registerModal.setHeading("Thanh toán tên miền");
+                        registerModal.setBody(this.setupModalBody());
+                        registerModal.show();
+                    })
                 }
             }
         
@@ -700,7 +862,6 @@
         </div>
     </div>
 
-    <!-- Domain Name Tips Section -->
     <div class="row my-5">
         <div class="col-md-6">
             <h4 class="text-primary fw-bold">Cách Chọn Tên Miền Phù Hợp</h4>
@@ -713,15 +874,12 @@
         </div>
         <div class="col-md-6">
             <img src="<?php echo home_url(); ?>/wp-content/uploads/2024/10/choose_domain.png" alt="Image" class="img-fluid rounded shadow-lg">
-            
         </div>
     </div>
 
-    <!-- Website Building Form Section -->
     <div class="row my-5 align-items-center">
         <div class="col-md-6">
             <img src="<?php echo home_url(); ?>/wp-content/uploads/2024/10/buid_web.jpg" alt="Image" class="img-fluid rounded shadow-lg">
-            
         </div>
         <div class="col-md-6">
             <h4 class="text-primary fw-bold">Bạn Cần Xây Dựng Website?</h4>
@@ -741,7 +899,6 @@
         </div>
     </div>
 
-    <!-- FAQ Section -->
     <div class="row my-5">
         <div class="col-md-12">
             <h4 class="text-primary fw-bold">Câu Hỏi Thường Gặp</h4>
@@ -755,4 +912,3 @@
         </div>
     </div>
 </div>
-{{-- @endsection --}}
