@@ -2,11 +2,11 @@
 /**
  * @wordpress-plugin
  * Plugin Name:       HK 123
- * Plugin URI:        https://hoangkhang.com.vn
+ * Plugin URI:        http://hk_wordpress.com
  * Description:       HK Plugin for WordPress
  * Version:           @VERSION
  * Author:            Hoang Khang Incotech
- * Author URI:        https://hoangkhang.com.vn
+ * Author URI:        http://hk_wordpress.com
  */
 
  # getResponse function
@@ -116,6 +116,7 @@ add_action('admin_menu', 'my_custom_menu');
 
 // Function for main menu page content
 function custom_menu_page() {
+    $response = hk_getResponse('/hk/main');
     $response = hk_getResponse('/hk/hosting');
 
     // send response
@@ -126,3 +127,20 @@ function custom_menu_page() {
 function custom_submenu_page() {
     echo '<h1>Welcome to the Submenu Page</h1>';
 }
+
+function handle_website_request() {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_REQUEST['page'] == 'hk') {
+        
+        $path = $_REQUEST['path']; 
+        
+        error_log('Form Data: ' . print_r($_POST, true)); 
+        
+        $response = hk_getResponse($path);
+        
+        $response->send(); 
+        
+        wp_die();
+    }
+}
+
+add_action('init', 'handle_website_request');

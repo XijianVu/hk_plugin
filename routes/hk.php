@@ -85,6 +85,7 @@ Route::middleware('guest')->group(function () {
     Route::post('hk/suggest-domains', [DomainController::class, 'suggestDomain']);
 
     //MainPage
-    Route::get('hk/main', [MainPageController::class, 'index']); 
-});
+    Route::get('hk/main', [MainPageController::class, 'index']);
+    Route::post('/main', [MainPageController::class, 'store']);
 
+});

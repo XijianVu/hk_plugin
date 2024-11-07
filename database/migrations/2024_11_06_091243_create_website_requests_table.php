@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('hosting_requests', function (Blueprint $table) {
+        Schema::create('website_requests', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
             $table->string('name');
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('hosting_requests');
+        Schema::dropIfExists('website_requests');
     }
 };
