@@ -29,10 +29,7 @@ class MainPageController extends Controller
             ], 400);
         }
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Đã thêm account thành công',
-        ]);
+        return redirect()->back()->with('success', 'Yêu cầu của bạn đã được gửi thành công!');
     }
     
     

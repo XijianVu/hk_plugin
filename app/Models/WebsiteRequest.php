@@ -21,15 +21,41 @@ class WebsiteRequest extends Model
 
     public function saveFromRequest($request)
     {
-        $validatedData = $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required',
             'email' => 'required|email',
-            'phone' => 'required',
+            'phone' => 'nullable|numeric|min:9',
         ]);
     
-        $this->fill($validatedData);
+        $validator->after(function($validator) {
+            if (self::relatedContactsByPhone($this->phone)->where('id', '!=', $this->id)->count()) {
+                $validator->errors()->add("phone", "Số điện thoại đã được sử dụng. Vui lòng tìm chọn liên hệ/khách hàng đã có.");
+            }
+        });
+    
+        if ($validator->fails()) {
+            return $validator->errors();
+        }
+    
+        $this->fill($request->all());
+    
+        // Lưu đối tượng
         $this->save();
     
         return null;
+    }
+
+    public function scopeRelatedContactsByPhone($query, $phone)
+    {
+        $compareNumber = \App\Library\Tool::getLastNineNumberOfPhone($phone);
+
+        if (empty($compareNumber)) {
+            return $query->where('id', -1);
+        }
+
+        $query->active()
+            ->where(function($q) use ($compareNumber) {
+                $q->where('phone', 'LIKE', "%$compareNumber");
+            });
     }
 }
