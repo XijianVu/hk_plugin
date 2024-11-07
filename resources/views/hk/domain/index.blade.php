@@ -1,9 +1,3 @@
-{{-- @extends('hk.site.layouts.main.app', [
-    'menu' => 'internal',
-]) --}}
-
-{{-- @section('content') --}}
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <style>
@@ -30,9 +24,7 @@
         </div>
 
         <style>
-            /* CSS tùy chỉnh cho form hiện đại */
             form {
-                max-width: 500px;
                 margin: auto;
             }
 
@@ -41,13 +33,13 @@
             }
 
             .input-group-text {
-                font-size: 1rem;
                 font-weight: 500;
                 color: #777;
             }
 
             .form-control {
-                padding: 0.75rem 1.25rem;
+                padding: 0.75
+                font-size: 1rem;rem 1.25rem;
                 font-size: 1rem;
                 border-radius: 8px;
             }
@@ -70,7 +62,28 @@
                 box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
             }
 
-            body{background: #f5f5f5}.rounded{border-radius: 1rem}.nav-pills .nav-link{color: #555}.nav-pills .nav-link.active{color: white}input[type="radio"]{margin-right: 5px}.bold{font-weight:bold}
+            body {
+                background: #f5f5f5
+            }
+            
+            .rounded {
+                border-radius: 1rem
+            }
+            
+            .nav-pills .nav-link { 
+                color: #555
+            } 
+            .nav-pills .nav-link.active {
+                color: white
+            }
+            
+            input[type="radio"] {
+                margin-right: 5px
+            }
+            
+            .bold {
+                font-weight:bold
+            }
         </style>
         
         <!-- The Modal -->
@@ -458,46 +471,47 @@
                     return $(this.container).find('[data-control="domain-price"]').html();
                 }
 
-                setupModalBody() {
-                    return `
-                        <form action="" class="p-4 rounded shadow-sm bg-light">
-                            <div class="form-group mb-4">
-                                <label for="domain" class="fs-5 fw-bold mb-2 ms-0">Tên miền</label>
-                                <div class="input-group shadow-sm">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text bg-white text-muted border-0">@</span>
-                                    </div>
-                                    <input id="domain" class="form-control border-0 shadow-none" type="text" value="hoanganh.com" aria-describedby="domain-addon" style="background-color: #f9f9f9;">
-                                </div>
-                            </div>
+                formatPrice(priceString) {
+                    const priceNumber = priceString.replace(/\D/g, ''); 
+                    const formattedPrice = Number(priceNumber).toLocaleString('en-US'); 
 
-                            <div class="form-group mb-4">
-                                <label for="price" class="fs-5 fw-bold mb-2 ms-0">Giá</label>
-                                <div class="input-group shadow-sm">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text bg-white text-muted border-0">VND</span>
-                                    </div>
-                                    <input id="price" class="form-control border-0 shadow-none" type="text" value="2000000" aria-describedby="price-addon" style="background-color: #f9f9f9;">
+                    return formattedPrice;
+                }
+
+                setupModalBody() {
+                    const name = this.getName();
+                    const price = this.getPrice();
+                    const formatedPrice = this.formatPrice(price);
+
+                    return `
+                        <form action="" class="p-4 rounded shadow-sm bg-light w-100">
+                            <style>
+                                .mobile-text {
+                                    color: #989696b8;
+                                    font-size: 15px;
+                                }
+
+                                .form-control {
+                                    margin-right: 12px;
+                                }
+
+                                .cursor {
+                                    cursor: pointer;
+                                }
+                            </style>
+                            <div class="d-flex justify-content-center align-items-center container">
+                                <div class="px-3">
+                                    <h2 class="m-0 mb-2 text-bold">${name}</h2><span class="mobile-text">Sở hữu tên miền <u><b class="text-danger">${name}</b></u> với <b class="text-danger">${formatedPrice} VNĐ</b>/Năm đầu tiên</span>
                                 </div>
                             </div>
 
                             <div class="text-center">
-                                <button type="submit" class="btn btn-success btn-lg w-100 rounded-pill shadow">Mua</button>
-
-                                
-
-                                <div class="container py-5">
-                                    <!-- For demo purpose -->
-                                    <div class="row mb-4">
-                                        <div class="col-lg-8 mx-auto text-center">
-                                            <h1 class="display-6">Bootstrap Payment Forms</h1>
-                                        </div>
-                                    </div> <!-- End -->
+                                <div class="container">
                                     <div class="row">
-                                        <div class="col-lg-6 mx-auto">
-                                            <div class="card ">
-                                                <div class="card-header">
-                                                    <div class="bg-white shadow-sm pt-4 pl-2 pr-2 pb-2">
+                                        <div class="col-lg-12 w-100 mx-auto">
+                                            <div class="">
+                                                <div class="">
+                                                    <div class="pt-4 pl-2 pr-2 pb-2">
                                                         <!-- Credit card form tabs -->
                                                         <ul role="tablist" class="nav bg-light nav-pills rounded nav-fill mb-3">
                                                             <li class="nav-item"> <a data-toggle="pill" href="#credit-card" class="nav-link active "> <i class="fas fa-credit-card mr-2"></i> Credit Card </a> </li>
@@ -534,38 +548,48 @@
                                                                             </label> <input type="text" required class="form-control"> </div>
                                                                     </div>
                                                                 </div>
-                                                                <div class="card-footer"> <button type="button" class="subscribe btn btn-primary btn-block shadow-sm"> Confirm Payment </button>
+                                                                <div class="footer"> <button type="button" class="subscribe btn btn-primary btn-block shadow-sm">Xác nhận thanh toán</button>
                                                             </form>
                                                         </div>
-                                                    </div> <!-- End -->
-                                                    <!-- Paypal info -->
+                                                    </div>
+
                                                     <div id="paypal" class="tab-pane fade pt-3">
-                                                        <h6 class="pb-2">Select your paypal account type</h6>
-                                                        <div class="form-group "> <label class="radio-inline"> <input type="radio" name="optradio" checked> Domestic </label> <label class="radio-inline"> <input type="radio" name="optradio" class="ml-5">International </label></div>
-                                                        <p> <button type="button" class="btn btn-primary "><i class="fab fa-paypal mr-2"></i> Log into my Paypal</button> </p>
-                                                        <p class="text-muted"> Note: After clicking on the button, you will be directed to a secure gateway for payment. After completing the payment process, you will be redirected back to the website to view details of your order. </p>
-                                                    </div> <!-- End -->
+                                                        <h6 class="pb-2">Chọn loại tài khoản PayPal của bạn</h6>
+                                                        <div class="form-group">
+                                                            <div class="custom-control custom-radio custom-control-inline">
+                                                                <input type="radio" id="domestic" name="optradio" class="custom-control-input" checked>
+                                                                <label class="custom-control-label" for="domestic">Domestic</label>
+                                                            </div>
+                                                            <div class="custom-control custom-radio custom-control-inline">
+                                                                <input type="radio" id="international" name="optradio" class="custom-control-input">
+                                                                <label class="custom-control-label" for="international">International</label>
+                                                            </div>
+                                                        </div>
+                                                        <p>
+                                                            <button type="button" class="btn btn-primary">
+                                                                <i class="fab fa-paypal mr-2"></i>Đăng nhập vào Paypal
+                                                            </button>
+                                                        </p>
+                                                        <p class="text-muted">
+                                                            Lưu ý: Sau khi nhấp vào nút, bạn sẽ được chuyển đến cổng thanh toán bảo mật. Sau khi hoàn tất quá trình thanh toán, bạn sẽ được chuyển lại về trang web để xem chi tiết đơn hàng của mình.
+                                                        </p>
+                                                    </div>
+
                                                     <!-- bank transfer info -->
                                                     <div id="net-banking" class="tab-pane fade pt-3">
-                                                        <div class="form-group "> <label for="Select Your Bank">
-                                                                <h6>Select your Bank</h6>
+                                                        <div class="form-group "> <label for="Tài khoản ngân hàng">
+                                                                <h6>Chọn ngân hàng</h6>
                                                             </label> <select class="form-control" id="ccmonth">
-                                                                <option value="" selected disabled>--Please select your Bank--</option>
-                                                                <option>Bank 1</option>
-                                                                <option>Bank 2</option>
-                                                                <option>Bank 3</option>
-                                                                <option>Bank 4</option>
-                                                                <option>Bank 5</option>
-                                                                <option>Bank 6</option>
-                                                                <option>Bank 7</option>
-                                                                <option>Bank 8</option>
-                                                                <option>Bank 9</option>
-                                                                <option>Bank 10</option>
+                                                                <option value="" selected disabled>--Chọn ngân hàng của bạn--</option>
+                                                                <option>Vietinbank</option>
+                                                                <option>Vietcombank</option>
+                                                                <option>Techcombank</option>
+                                                                <option>Agribank</option>
                                                             </select> </div>
                                                         <div class="form-group">
-                                                            <p> <button type="button" class="btn btn-primary "><i class="fas fa-mobile-alt mr-2"></i> Proceed Payment</button> </p>
+                                                            <p> <button type="button" class="btn btn-primary "><i class="fas fa-mobile-alt mr-2"></i>Tiến hành thanh toán</button> </p>
                                                         </div>
-                                                        <p class="text-muted">Note: After clicking on the button, you will be directed to a secure gateway for payment. After completing the payment process, you will be redirected back to the website to view details of your order. </p>
+                                                        <p class="text-muted">Lưu ý: Sau khi nhấp vào nút, bạn sẽ được chuyển đến cổng thanh toán bảo mật. Sau khi hoàn tất quá trình thanh toán, bạn sẽ được chuyển lại về trang web để xem chi tiết đơn hàng của mình.</p>
                                                     </div> <!-- End -->
                                                     <!-- End -->
                                                 </div>
@@ -583,7 +607,7 @@
 
                         const url = this.getUrl();
 
-                        registerModal.setHeading(this.getName());
+                        registerModal.setHeading("Thanh toán tên miền");
                         registerModal.setBody(this.setupModalBody());
                         registerModal.show();
                     })
@@ -636,7 +660,6 @@
         </div>
     </div>
 
-    <!-- Support, Easy Management, Quality Commitment -->
     <div class="row text-center my-5">
         <div class="col-md-4">
             <div class="card shadow-sm py-4 border-0 rounded">
@@ -656,7 +679,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-8 mx-auto" data-form="search-domain" data-url="<?php echo
+        <div class="col-md-4 mx-auto" data-form="search-domain" data-url="">
             <div class="card shadow-sm py-4 border-0 rounded">
                 <div class="card-body">
                     <i class="bi bi-patch-check fs-1 text-primary"></i>

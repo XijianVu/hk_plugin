@@ -9,7 +9,7 @@
         </div>
 
         <div class="col-md-3">
-            <span data-control="domain-price">{{ $domain['price'] }} vnđ</span>
+            <span data-control="domain-price">{{ $domain['price'] }}</span><span> VNĐ</span>
         </div>
 
         <div class="col-md-3">
