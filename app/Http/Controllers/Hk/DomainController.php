@@ -49,4 +49,9 @@ class DomainController extends Controller
             'domains' => $suggestDomains
         ], 200);
     }
+
+    public function registerForm(Request $requst)
+    {
+        return view('hk.domain.register');
+    }
 }

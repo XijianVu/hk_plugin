@@ -29,6 +29,73 @@
             <p class="text-muted fs-5 fst-italic mb-0 text-center">Tìm tên miền hoàn hảo cho doanh nghiệp hoặc thương hiệu cá nhân của bạn</p>
         </div>
 
+        <style>
+            /* CSS tùy chỉnh cho form hiện đại */
+            form {
+                max-width: 500px;
+                margin: auto;
+            }
+
+            .form-group label {
+                color: #333;
+            }
+
+            .input-group-text {
+                font-size: 1rem;
+                font-weight: 500;
+                color: #777;
+            }
+
+            .form-control {
+                padding: 0.75rem 1.25rem;
+                font-size: 1rem;
+                border-radius: 8px;
+            }
+
+            .form-control:focus {
+                background-color: #f3f3f3;
+                border-color: #80bdff;
+                box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+            }
+
+            .btn-success {
+                padding: 0.75rem 0;
+                font-size: 1.2rem;
+                font-weight: bold;
+                transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            }
+
+            .btn-success:hover {
+                background-color: #28a745cc;
+                box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+            }
+
+            body{background: #f5f5f5}.rounded{border-radius: 1rem}.nav-pills .nav-link{color: #555}.nav-pills .nav-link.active{color: white}input[type="radio"]{margin-right: 5px}.bold{font-weight:bold}
+        </style>
+        
+        <!-- The Modal -->
+        <div class="modal" id="register-modal">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 data-control="modal-heading" class="modal-title">Modal Heading</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+        
+                    <!-- Modal body -->
+                    <div class="modal-body" data-control="modal-body">
+                        
+                    </div>
+        
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Đóng</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="col-md-8 mx-auto" data-form="search-domain" data-url="<?php echo esc_url(get_site_url()); ?>?page=hk&path=/hk/search-domain">
             @csrf
             <div class="row py-3">
@@ -95,11 +162,48 @@
         </div>
 
         <script>
+            window.popups = {};
+            var registerModal;
+
             $(() => {
+                registerModal = new RegisterModal({
+                    container: $('#register-modal')
+                });
+
                 new DomainManager({
                     container: $('[data-container="domain-manager"]')
                 })
             });
+
+            var RegisterModal = class {
+                constructor(options) {
+                    this.container = options.container;
+                }
+
+                show() {
+                    $(this.container).modal('show');
+                }
+
+                hide() {
+                    $(this.container).modal('hide');
+                }
+
+                getHeading() {
+                    return this.container.find('[data-control="modal-heading"]');
+                }
+
+                getBody() {
+                    return this.container.find('[data-control="modal-body"]');
+                }
+
+                setHeading(heading) {
+                    this.getHeading().html(heading)
+                }
+
+                setBody(body) {
+                    this.getBody().html(body);
+                }
+            }
 
             var DomainManager = class {
                 constructor(options) {
@@ -275,6 +379,10 @@
                     return this.container.find('[data-form="items-box"]');
                 }
 
+                getHtmlItems() {
+                    return this.getItemsBox().find('[data-control="domain-item"]');
+                }
+
                 getSuggestUrl() {
                     return this.container.attr('data-action');
                 }
@@ -289,6 +397,21 @@
 
                 removeSpinner() {
                     this.getItemsBox().find('.spinner').remove();
+                }
+
+                addItems(res) {
+                    this.getItemsBox().html(res);
+                    this.generateItems();
+                }
+
+                generateItems() {
+                    const htmlItems = this.getHtmlItems();
+
+                    htmlItems.each((i, htmlItem) => {
+                        new SuggestedDomain({
+                            container: htmlItem
+                        })
+                    });
                 }
                 
                 suggest(searchValue = null) {
@@ -305,9 +428,164 @@
                         }
                     }).done(res => {
                         this.removeSpinner();
-                        this.getItemsBox().html(res);
+                        this.addItems(res);
                     }).fail(res => {
                         console.error(res);
+                    })
+                }
+            }
+
+            var SuggestedDomain = class {
+                constructor (options) {
+                    this.container = options.container;
+
+                    this.events();
+                }
+
+                getBuyBtn() {
+                    return $(this.container).find('[data-action="buy-btn"]')
+                }
+
+                getUrl() {
+                    return $(this.container).attr('data-url');
+                }
+
+                getName() {
+                    return $(this.container).find('[data-control="domain-name"]').html();
+                }
+
+                getPrice() {
+                    return $(this.container).find('[data-control="domain-price"]').html();
+                }
+
+                setupModalBody() {
+                    return `
+                        <form action="" class="p-4 rounded shadow-sm bg-light">
+                            <div class="form-group mb-4">
+                                <label for="domain" class="fs-5 fw-bold mb-2 ms-0">Tên miền</label>
+                                <div class="input-group shadow-sm">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-white text-muted border-0">@</span>
+                                    </div>
+                                    <input id="domain" class="form-control border-0 shadow-none" type="text" value="hoanganh.com" aria-describedby="domain-addon" style="background-color: #f9f9f9;">
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label for="price" class="fs-5 fw-bold mb-2 ms-0">Giá</label>
+                                <div class="input-group shadow-sm">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-white text-muted border-0">VND</span>
+                                    </div>
+                                    <input id="price" class="form-control border-0 shadow-none" type="text" value="2000000" aria-describedby="price-addon" style="background-color: #f9f9f9;">
+                                </div>
+                            </div>
+
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-success btn-lg w-100 rounded-pill shadow">Mua</button>
+
+                                
+
+                                <div class="container py-5">
+                                    <!-- For demo purpose -->
+                                    <div class="row mb-4">
+                                        <div class="col-lg-8 mx-auto text-center">
+                                            <h1 class="display-6">Bootstrap Payment Forms</h1>
+                                        </div>
+                                    </div> <!-- End -->
+                                    <div class="row">
+                                        <div class="col-lg-6 mx-auto">
+                                            <div class="card ">
+                                                <div class="card-header">
+                                                    <div class="bg-white shadow-sm pt-4 pl-2 pr-2 pb-2">
+                                                        <!-- Credit card form tabs -->
+                                                        <ul role="tablist" class="nav bg-light nav-pills rounded nav-fill mb-3">
+                                                            <li class="nav-item"> <a data-toggle="pill" href="#credit-card" class="nav-link active "> <i class="fas fa-credit-card mr-2"></i> Credit Card </a> </li>
+                                                            <li class="nav-item"> <a data-toggle="pill" href="#paypal" class="nav-link "> <i class="fab fa-paypal mr-2"></i> Paypal </a> </li>
+                                                            <li class="nav-item"> <a data-toggle="pill" href="#net-banking" class="nav-link "> <i class="fas fa-mobile-alt mr-2"></i> Net Banking </a> </li>
+                                                        </ul>
+                                                    </div> <!-- End -->
+                                                    <!-- Credit card form content -->
+                                                    <div class="tab-content">
+                                                        <!-- credit card info-->
+                                                        <div id="credit-card" class="tab-pane fade show active pt-3">
+                                                            <form role="form" onsubmit="event.preventDefault()">
+                                                                <div class="form-group"> <label for="username">
+                                                                        <h6>Card Owner</h6>
+                                                                    </label> <input type="text" name="username" placeholder="Card Owner Name" required class="form-control "> </div>
+                                                                <div class="form-group"> <label for="cardNumber">
+                                                                        <h6>Card number</h6>
+                                                                    </label>
+                                                                    <div class="input-group"> <input type="text" name="cardNumber" placeholder="Valid card number" class="form-control " required>
+                                                                        <div class="input-group-append"> <span class="input-group-text text-muted"> <i class="fab fa-cc-visa mx-1"></i> <i class="fab fa-cc-mastercard mx-1"></i> <i class="fab fa-cc-amex mx-1"></i> </span> </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-sm-8">
+                                                                        <div class="form-group"> <label><span class="hidden-xs">
+                                                                                    <h6>Expiration Date</h6>
+                                                                                </span></label>
+                                                                            <div class="input-group"> <input type="number" placeholder="MM" name="" class="form-control" required> <input type="number" placeholder="YY" name="" class="form-control" required> </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-sm-4">
+                                                                        <div class="form-group mb-4"> <label data-toggle="tooltip" title="Three digit CV code on the back of your card">
+                                                                                <h6>CVV <i class="fa fa-question-circle d-inline"></i></h6>
+                                                                            </label> <input type="text" required class="form-control"> </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="card-footer"> <button type="button" class="subscribe btn btn-primary btn-block shadow-sm"> Confirm Payment </button>
+                                                            </form>
+                                                        </div>
+                                                    </div> <!-- End -->
+                                                    <!-- Paypal info -->
+                                                    <div id="paypal" class="tab-pane fade pt-3">
+                                                        <h6 class="pb-2">Select your paypal account type</h6>
+                                                        <div class="form-group "> <label class="radio-inline"> <input type="radio" name="optradio" checked> Domestic </label> <label class="radio-inline"> <input type="radio" name="optradio" class="ml-5">International </label></div>
+                                                        <p> <button type="button" class="btn btn-primary "><i class="fab fa-paypal mr-2"></i> Log into my Paypal</button> </p>
+                                                        <p class="text-muted"> Note: After clicking on the button, you will be directed to a secure gateway for payment. After completing the payment process, you will be redirected back to the website to view details of your order. </p>
+                                                    </div> <!-- End -->
+                                                    <!-- bank transfer info -->
+                                                    <div id="net-banking" class="tab-pane fade pt-3">
+                                                        <div class="form-group "> <label for="Select Your Bank">
+                                                                <h6>Select your Bank</h6>
+                                                            </label> <select class="form-control" id="ccmonth">
+                                                                <option value="" selected disabled>--Please select your Bank--</option>
+                                                                <option>Bank 1</option>
+                                                                <option>Bank 2</option>
+                                                                <option>Bank 3</option>
+                                                                <option>Bank 4</option>
+                                                                <option>Bank 5</option>
+                                                                <option>Bank 6</option>
+                                                                <option>Bank 7</option>
+                                                                <option>Bank 8</option>
+                                                                <option>Bank 9</option>
+                                                                <option>Bank 10</option>
+                                                            </select> </div>
+                                                        <div class="form-group">
+                                                            <p> <button type="button" class="btn btn-primary "><i class="fas fa-mobile-alt mr-2"></i> Proceed Payment</button> </p>
+                                                        </div>
+                                                        <p class="text-muted">Note: After clicking on the button, you will be directed to a secure gateway for payment. After completing the payment process, you will be redirected back to the website to view details of your order. </p>
+                                                    </div> <!-- End -->
+                                                    <!-- End -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                            </div>
+                        </form>
+                    `
+                }
+
+                events() {
+                    this.getBuyBtn().on('click', e => {
+                        e.preventDefault();
+
+                        const url = this.getUrl();
+
+                        registerModal.setHeading(this.getName());
+                        registerModal.setBody(this.setupModalBody());
+                        registerModal.show();
                     })
                 }
             }
@@ -378,7 +656,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-8 mx-auto" data-form="search-domain" data-url="<?php echo
             <div class="card shadow-sm py-4 border-0 rounded">
                 <div class="card-body">
                     <i class="bi bi-patch-check fs-1 text-primary"></i>
