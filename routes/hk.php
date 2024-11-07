@@ -86,6 +86,7 @@ Route::middleware('guest')->group(function () {
     Route::get('hk/register-form', [DomainController::class, 'registerForm']);
 
     //MainPage
-    Route::get('hk/main', [MainPageController::class, 'index']); 
-});
+    Route::get('hk/main', [MainPageController::class, 'index']);
+    Route::post('/main', [MainPageController::class, 'store']);
 
+});
