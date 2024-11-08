@@ -10,5 +10,6 @@ class HostingRequest extends Model
         'name',
         'phone',
         'email',
+        'type',
     ];
 }

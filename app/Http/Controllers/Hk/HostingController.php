@@ -19,6 +19,7 @@ class HostingController extends Controller
             'name' => $request->name,
             'phone' => $request->phone,
             'email' => $request->email,
+            'type' => $request->type,
         ]);
         
         return redirect()->back()->with('success', 'Yêu cầu của bạn đã được gửi thành công!');
