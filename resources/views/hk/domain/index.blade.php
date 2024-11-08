@@ -1,4 +1,5 @@
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>\
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
     .spinner {
@@ -186,6 +187,130 @@
                 })
             });
 
+            var HKTool = {
+                alert: function(options) {
+                    if (!options.icon) {
+                        options.icon = 'success'
+                    }
+
+                    if (!options.textOk) {
+                        options.textOk = 'OK'
+                    }
+
+                    Swal.fire({
+                        html: options.message,
+                        icon: options.icon,
+                        buttonsStyling: false,
+                        confirmButtonText: options.textOk,
+                        allowEnterKey: true,
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    }).then((result) => {
+                        if (options.ok) {
+                            options.ok();
+                        }
+                    });
+                },
+
+                confirm: function(options) {
+                    Swal.fire({
+                        title: 'Bạn chắc chứ?',
+                        text: options.message,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Đồng ý',
+                        cancelButtonText: 'Hủy',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            if (options.ok) {
+                                options.ok();
+                            }
+                        }
+
+                        if (result.isDismissed) {
+                            if (options.cancel) {
+                                options.cancel();
+                            }
+                        }
+                        
+                    });
+                },
+                
+                addPageLoadingEffect: function() {
+                    var element = document.createElement('div')
+                    element.innerHTML = `
+                        <div data-control="page-loading" style="
+                            width: 100%;
+                            height: 100%;
+                            background-color: rgba(0,0,0,0.1);
+                            position: fixed;
+                            top: 0;
+                            left: 0;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            z-index: 1000000;
+                        ">
+                            <div class="spinner-grow" style="width: 3rem; height: 3rem;" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(element);
+                },
+
+                removePageLoadingEffect: function() {
+                    document.querySelector('[data-control="page-loading"]').remove();
+                },
+
+                fixPopupLayers: function() {
+                    var initZIndex = 1000;
+
+                    $('.modal-backdrop:visible').each(function(index) {
+                        var zIndex = initZIndex + (index*10);
+
+                        $(this).css('z-index', zIndex);
+                    });
+
+                    var initZIndex = 1010;
+
+                    $('.modal:visible').each(function(index) {
+                        var zIndex = initZIndex + (index*10);
+
+                        $(this).css('z-index', zIndex);
+                    });
+                },
+
+                warning: function(options) {
+
+                    if (!options.icon) {
+                        options.icon = 'warning'
+                    }
+
+                    if (!options.textOk) {
+                        options.textOk = 'OK'
+                    }
+
+                    Swal.fire({
+                        text: options.message,
+                        icon: options.icon,
+                        buttonsStyling: false,
+                        confirmButtonText: options.textOk,
+                        allowEnterKey: true,
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    }).then((result) => {
+                        if (options.ok) {
+                            options.ok();
+                        }
+                    });
+                },
+            };
+
             var RegisterModal = class {
                 constructor(options) {
                     this.container = options.container;
@@ -324,131 +449,106 @@
                     const formatedPrice = this.formatPrice(price);
 
                     return `
-                        <form action="" class="p-4 rounded shadow-sm bg-light w-100">
-                            <style>
-                                .mobile-text {
-                                    color: #989696b8;
-                                    font-size: 15px;
-                                }
-
-                                .form-control {
-                                    margin-right: 12px;
-                                }
-
-                                .cursor {
-                                    cursor: pointer;
-                                }
-                            </style>
+                        <form data-form="create-suggest" class="rounded shadow-sm overflow-hidden">
+                            @csrf
                             <div class="d-flex justify-content-center align-items-center container">
                                 <div class="px-3">
                                     <h2 class="m-0 mb-2 text-bold">${name}</h2><span class="mobile-text">Sở hữu tên miền <u><b class="text-danger">${name}</b></u> với <b class="text-danger">${formatedPrice} VNĐ</b>/Năm đầu tiên</span>
                                 </div>
                             </div>
 
-                            <div class="text-center">
-                                <div class="container">
-                                    <div class="row">
-                                        <div class="col-lg-12 w-100 mx-auto">
-                                            <div class="">
-                                                <div class="">
-                                                    <div class="pt-4 pl-2 pr-2 pb-2">
-                                                        <!-- Credit card form tabs -->
-                                                        <ul role="tablist" class="nav bg-light nav-pills rounded nav-fill mb-3">
-                                                            <li class="nav-item"> <a data-toggle="pill" href="#credit-card" class="nav-link active "> <i class="fas fa-credit-card mr-2"></i> Credit Card </a> </li>
-                                                            <li class="nav-item"> <a data-toggle="pill" href="#paypal" class="nav-link "> <i class="fab fa-paypal mr-2"></i> Paypal </a> </li>
-                                                            <li class="nav-item"> <a data-toggle="pill" href="#net-banking" class="nav-link "> <i class="fas fa-mobile-alt mr-2"></i> Net Banking </a> </li>
-                                                        </ul>
-                                                    </div>
+                            <input type="hidden" value="${name}" name="name">
+                            <input type="hidden" value="${price}" name="price">
 
-                                                    <div class="tab-content">
-                                                        <div id="credit-card" class="tab-pane fade show active pt-3">
-                                                            <form role="form" onsubmit="event.preventDefault()">
-                                                                <div class="form-group"> 
-                                                                    <label class="ms-0" for="username">
-                                                                        <h5 class="text-bold">Chủ Thẻ</h5>
-                                                                    </label> 
-                                                                    <input type="text" name="username" placeholder="Tên chủ thẻ" required class="form-control "> 
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label class="ms-0" for="cardNumber">
-                                                                        <h5 class="text-bold">Số Thẻ</h5>
+                            <div class="card-body p-0">
+                                <div class="row gy-3 gy-md-4 gy-lg-0">
+                                    <div class="col-12 col-md-12">
+                                        <div class="row align-items-lg-center h-100">
+                                            <div class="col-12">
+                                                <form action="#!">
+                                                    <div class="row gy-4 gy-xl-5 p-4 p-xl-5">
+                                                        <div class="col-12 col-md-12 mt-3">
+                                                            <div class="row">
+                                                                <div class="col-md-2 d-flex align-items-center p-0 justify-content-left">
+                                                                    <label for="email" class="form-label mb-0">
+                                                                        Tên <span class="text-danger">*</span>
                                                                     </label>
-                                                                    <div class="input-group"> 
-                                                                        <input type="text" name="cardNumber" placeholder="Số thẻ hợp lệ" class="form-control " required>
-                                                                        <div class="input-group-append">
-                                                                            <span class="input-group-text text-muted">
-                                                                                <i class="fab fa-cc-visa mx-1"></i>
-                                                                                <i class="fab fa-cc-mastercard mx-1"></i>
-                                                                                <i class="fab fa-cc-amex mx-1"></i>
-                                                                            </span>
-                                                                        </div>
+                                                                </div>
+                                                            
+                                                                <div class="col-md-10 p-0">
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-text">
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+                                                                                <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 1a5 5 0 0 0-4.546 2.914A5.982 5.982 0 0 0 8 16a5.982 5.982 0 0 0 4.546-2.086A5 5 0 0 0 8 9zm0 7a4.978 4.978 0 0 1-3.598-1.6C5.48 13.66 6.615 13 8 13s2.52.66 3.598 1.4A4.978 4.978 0 0 1 8 16z"/>
+                                                                            </svg>
+                                                                        </span>
+                                                                        <input type="text" class="form-control" id="name" name="name" value="" required>
                                                                     </div>
                                                                 </div>
-                                                                <div class="row">
-                                                                    <div class="col-sm-8">
-                                                                        <div class="form-group"> <label><span class="hidden-xs">
-                                                                                    <h5 class="text-bold">Expiration Date</h5>
-                                                                                </span></label>
-                                                                            <div class="input-group"> <input type="number" placeholder="MM" name="" class="form-control" required> <input type="number" placeholder="YY" name="" class="form-control" required> </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-sm-4">
-                                                                        <div class="form-group mb-4"> <label data-toggle="tooltip" title="Three digit CV code on the back of your card">
-                                                                                <h5 class="text-bold">CVV <i class="fa fa-question-circle d-inline"></i></h5>
-                                                                            </label> <input type="text" required class="form-control"> </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-12 col-md-12 mt-3">
+                                                            <div class="row">
+                                                                <div class="col-md-2 d-flex align-items-center p-0 justify-content-left">
+                                                                    <label for="email" class="form-label mb-0">
+                                                                        Email <span class="text-danger">*</span>
+                                                                    </label>
+                                                                </div>
+                                                            
+                                                                <div class="col-md-10 p-0">
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-text">
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope" viewBox="0 0 16 16">
+                                                                                <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z" />
+                                                                            </svg>
+                                                                        </span>
+                                                                        <input type="email" class="form-control" id="email" name="email" value="" required>
                                                                     </div>
                                                                 </div>
-                                                                <div class="footer"> <button type="button" class="subscribe btn btn-primary btn-block shadow-sm">Xác nhận thanh toán</button>
-                                                            </form>
-                                                        </div>
-                                                    </div>
-
-                                                    <div id="paypal" class="tab-pane fade pt-3">
-                                                        <h6 class="pb-2">Chọn loại tài khoản PayPal của bạn</h6>
-                                                        <div class="form-group">
-                                                            <div class="custom-control custom-radio custom-control-inline">
-                                                                <input type="radio" id="domestic" name="optradio" class="custom-control-input" checked>
-                                                                <label class="custom-control-label" for="domestic">Domestic</label>
-                                                            </div>
-                                                            <div class="custom-control custom-radio custom-control-inline">
-                                                                <input type="radio" id="international" name="optradio" class="custom-control-input">
-                                                                <label class="custom-control-label" for="international">International</label>
                                                             </div>
                                                         </div>
-                                                        <p>
-                                                            <button type="button" class="btn btn-primary">
-                                                                <i class="fab fa-paypal mr-2"></i>Đăng nhập vào Paypal
-                                                            </button>
-                                                        </p>
-                                                        <p class="text-muted">
-                                                            Lưu ý: Sau khi nhấp vào nút, bạn sẽ được chuyển đến cổng thanh toán bảo mật. Sau khi hoàn tất quá trình thanh toán, bạn sẽ được chuyển lại về trang web để xem chi tiết đơn hàng của mình.
-                                                        </p>
-                                                    </div>
 
-                                                    <!-- bank transfer info -->
-                                                    <div id="net-banking" class="tab-pane fade pt-3">
-                                                        <div class="form-group "> <label for="Tài khoản ngân hàng">
-                                                                <h6>Chọn ngân hàng</h6>
-                                                            </label> <select class="form-control" id="ccmonth">
-                                                                <option value="" selected disabled>--Chọn ngân hàng của bạn--</option>
-                                                                <option>Vietinbank</option>
-                                                                <option>Vietcombank</option>
-                                                                <option>Techcombank</option>
-                                                                <option>Agribank</option>
-                                                            </select> </div>
-                                                        <div class="form-group">
-                                                            <p> <button type="button" class="btn btn-primary "><i class="fas fa-mobile-alt mr-2"></i>Tiến hành thanh toán</button> </p>
+                                                        <div class="col-12 col-md-12 mt-3">
+                                                            <div class="row">
+                                                                <div class="col-md-2 d-flex align-items-center p-0 justify-content-left">
+                                                                    <label for="phone" class="form-label mb-0">
+                                                                        Số điện thoại <span class="text-danger">*</span>
+                                                                    </label>
+                                                                </div>
+                                                            
+                                                                <div class="col-md-10 p-0">
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-text">
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-telephone" viewBox="0 0 16 16">
+                                                                                <path d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.568 17.568 0 0 0 4.168 6.608 17.569 17.569 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.678.678 0 0 0-.58-.122l-2.19.547a1.745 1.745 0 0 1-1.657-.459L5.482 8.062a1.745 1.745 0 0 1-.46-1.657l.548-2.19a.678.678 0 0 0-.122-.58L3.654 1.328zM1.884.511a1.745 1.745 0 0 1 2.612.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.678.678 0 0 0 .178.643l2.457 2.457a.678.678 0 0 0 .644.178l2.189-.547a1.745 1.745 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.634 18.634 0 0 1-7.01-4.42 18.634 18.634 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877L1.885.511z" />
+                                                                            </svg>
+                                                                        </span>
+                                                                        <input type="number" class="form-control" id="phone" name="phone" value="" required>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        <p class="text-muted">Lưu ý: Sau khi nhấp vào nút, bạn sẽ được chuyển đến cổng thanh toán bảo mật. Sau khi hoàn tất quá trình thanh toán, bạn sẽ được chuyển lại về trang web để xem chi tiết đơn hàng của mình.</p>
-                                                    </div> <!-- End -->
-                                                    <!-- End -->
-                                                </div>
+                                                        <div class="col-12 mt-5">
+                                                            <div class="d-grid">
+                                                                <button data-action="save" class="btn btn-primary btn-lg" type="submit">Hoàn Tất Đăng Ký</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
                             </div>
                         </form>
-                    `
+                    `;
+                }
+
+                initForm() {
+                    new CreateForm({
+                        container: $('[data-form="create-suggest"]')
+                    })
                 }
 
                 events() {
@@ -458,6 +558,8 @@
                         registerModal.setHeading("Thanh toán tên miền");
                         registerModal.setBody(this.setupModalBody());
                         registerModal.show();
+
+                        this.initForm();
                     })
                 }
             }
@@ -610,6 +712,51 @@
                 }
             }
 
+            var CreateForm = class {
+                constructor(options) {
+                    this.container = options.container;
+                    this.events();
+                }
+
+                getSaveBtn() {
+                    return this.container.find('[data-action="save"]')
+                }
+
+                getUrl() {
+                    return "{!! esc_url(get_site_url()) . '?page=hk&path=/hk/save-order' !!}";
+                }
+
+                events() {
+                    this.getSaveBtn().on('click', e => {
+                        e.preventDefault();
+
+                        const data = $(this.container).serialize();
+
+                        $.ajax({
+                            url: this.getUrl(),
+                            method: 'POST',
+                            data: data
+                        }).done(res => {
+                            HKTool.alert({
+                                icon: 'success',
+                                message: "Tạo đơn thành công!",
+                                ok: () => {
+                                    registerModal.hide();
+                                }
+                            })
+                        }).fail(res => {
+                            HKTool.alert({
+                                icon: 'error',
+                                message: "Tạo đơn thất bại, vui lòng kiểm tra lại!",
+                                ok: () => {
+                                    
+                                }
+                            })
+                        })
+                    })
+                }
+            }
+
             var SuggestedDomain = class {
                 constructor (options) {
                     this.container = options.container;
@@ -646,131 +793,106 @@
                     const formatedPrice = this.formatPrice(price);
 
                     return `
-                        <form action="" class="p-4 rounded shadow-sm bg-light w-100">
-                            <style>
-                                .mobile-text {
-                                    color: #989696b8;
-                                    font-size: 15px;
-                                }
-
-                                .form-control {
-                                    margin-right: 12px;
-                                }
-
-                                .cursor {
-                                    cursor: pointer;
-                                }
-                            </style>
+                        <form data-form="create-suggest" class="rounded shadow-sm overflow-hidden">
+                            @csrf
                             <div class="d-flex justify-content-center align-items-center container">
                                 <div class="px-3">
                                     <h2 class="m-0 mb-2 text-bold">${name}</h2><span class="mobile-text">Sở hữu tên miền <u><b class="text-danger">${name}</b></u> với <b class="text-danger">${formatedPrice} VNĐ</b>/Năm đầu tiên</span>
                                 </div>
                             </div>
 
-                            <div class="text-center">
-                                <div class="container">
-                                    <div class="row">
-                                        <div class="col-lg-12 w-100 mx-auto">
-                                            <div class="">
-                                                <div class="">
-                                                    <div class="pt-4 pl-2 pr-2 pb-2">
-                                                        <!-- Credit card form tabs -->
-                                                        <ul role="tablist" class="nav bg-light nav-pills rounded nav-fill mb-3">
-                                                            <li class="nav-item"> <a data-toggle="pill" href="#credit-card" class="nav-link active "> <i class="fas fa-credit-card mr-2"></i> Credit Card </a> </li>
-                                                            <li class="nav-item"> <a data-toggle="pill" href="#paypal" class="nav-link "> <i class="fab fa-paypal mr-2"></i> Paypal </a> </li>
-                                                            <li class="nav-item"> <a data-toggle="pill" href="#net-banking" class="nav-link "> <i class="fas fa-mobile-alt mr-2"></i> Net Banking </a> </li>
-                                                        </ul>
-                                                    </div>
+                            <input type="hidden" value="${name}" name="name">
+                            <input type="hidden" value="${price}" name="price">
 
-                                                    <div class="tab-content">
-                                                        <div id="credit-card" class="tab-pane fade show active pt-3">
-                                                            <form role="form" onsubmit="event.preventDefault()">
-                                                                <div class="form-group"> 
-                                                                    <label class="ms-0" for="username">
-                                                                        <h5 class="text-bold">Chủ Thẻ</h5>
-                                                                    </label> 
-                                                                    <input type="text" name="username" placeholder="Tên chủ thẻ" required class="form-control "> 
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label class="ms-0" for="cardNumber">
-                                                                        <h5 class="text-bold">Số Thẻ</h5>
+                            <div class="card-body p-0">
+                                <div class="row gy-3 gy-md-4 gy-lg-0">
+                                    <div class="col-12 col-md-12">
+                                        <div class="row align-items-lg-center h-100">
+                                            <div class="col-12">
+                                                <form action="#!">
+                                                    <div class="row gy-4 gy-xl-5 p-4 p-xl-5">
+                                                        <div class="col-12 col-md-12 mt-3">
+                                                            <div class="row">
+                                                                <div class="col-md-2 d-flex align-items-center p-0 justify-content-left">
+                                                                    <label for="email" class="form-label mb-0">
+                                                                        Tên <span class="text-danger">*</span>
                                                                     </label>
-                                                                    <div class="input-group"> 
-                                                                        <input type="text" name="cardNumber" placeholder="Số thẻ hợp lệ" class="form-control " required>
-                                                                        <div class="input-group-append">
-                                                                            <span class="input-group-text text-muted">
-                                                                                <i class="fab fa-cc-visa mx-1"></i>
-                                                                                <i class="fab fa-cc-mastercard mx-1"></i>
-                                                                                <i class="fab fa-cc-amex mx-1"></i>
-                                                                            </span>
-                                                                        </div>
+                                                                </div>
+                                                            
+                                                                <div class="col-md-10 p-0">
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-text">
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+                                                                                <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 1a5 5 0 0 0-4.546 2.914A5.982 5.982 0 0 0 8 16a5.982 5.982 0 0 0 4.546-2.086A5 5 0 0 0 8 9zm0 7a4.978 4.978 0 0 1-3.598-1.6C5.48 13.66 6.615 13 8 13s2.52.66 3.598 1.4A4.978 4.978 0 0 1 8 16z"/>
+                                                                            </svg>
+                                                                        </span>
+                                                                        <input type="text" class="form-control" id="name" name="name" value="" required>
                                                                     </div>
                                                                 </div>
-                                                                <div class="row">
-                                                                    <div class="col-sm-8">
-                                                                        <div class="form-group"> <label><span class="hidden-xs">
-                                                                                    <h5 class="text-bold">Expiration Date</h5>
-                                                                                </span></label>
-                                                                            <div class="input-group"> <input type="number" placeholder="MM" name="" class="form-control" required> <input type="number" placeholder="YY" name="" class="form-control" required> </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-sm-4">
-                                                                        <div class="form-group mb-4"> <label data-toggle="tooltip" title="Three digit CV code on the back of your card">
-                                                                                <h5 class="text-bold">CVV <i class="fa fa-question-circle d-inline"></i></h5>
-                                                                            </label> <input type="text" required class="form-control"> </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-12 col-md-12 mt-3">
+                                                            <div class="row">
+                                                                <div class="col-md-2 d-flex align-items-center p-0 justify-content-left">
+                                                                    <label for="email" class="form-label mb-0">
+                                                                        Email <span class="text-danger">*</span>
+                                                                    </label>
+                                                                </div>
+                                                            
+                                                                <div class="col-md-10 p-0">
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-text">
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope" viewBox="0 0 16 16">
+                                                                                <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z" />
+                                                                            </svg>
+                                                                        </span>
+                                                                        <input type="email" class="form-control" id="email" name="email" value="" required>
                                                                     </div>
                                                                 </div>
-                                                                <div class="footer"> <button type="button" class="subscribe btn btn-primary btn-block shadow-sm">Xác nhận thanh toán</button>
-                                                            </form>
-                                                        </div>
-                                                    </div>
-
-                                                    <div id="paypal" class="tab-pane fade pt-3">
-                                                        <h6 class="pb-2">Chọn loại tài khoản PayPal của bạn</h6>
-                                                        <div class="form-group">
-                                                            <div class="custom-control custom-radio custom-control-inline">
-                                                                <input type="radio" id="domestic" name="optradio" class="custom-control-input" checked>
-                                                                <label class="custom-control-label" for="domestic">Domestic</label>
-                                                            </div>
-                                                            <div class="custom-control custom-radio custom-control-inline">
-                                                                <input type="radio" id="international" name="optradio" class="custom-control-input">
-                                                                <label class="custom-control-label" for="international">International</label>
                                                             </div>
                                                         </div>
-                                                        <p>
-                                                            <button type="button" class="btn btn-primary">
-                                                                <i class="fab fa-paypal mr-2"></i>Đăng nhập vào Paypal
-                                                            </button>
-                                                        </p>
-                                                        <p class="text-muted">
-                                                            Lưu ý: Sau khi nhấp vào nút, bạn sẽ được chuyển đến cổng thanh toán bảo mật. Sau khi hoàn tất quá trình thanh toán, bạn sẽ được chuyển lại về trang web để xem chi tiết đơn hàng của mình.
-                                                        </p>
-                                                    </div>
 
-                                                    <!-- bank transfer info -->
-                                                    <div id="net-banking" class="tab-pane fade pt-3">
-                                                        <div class="form-group "> <label for="Tài khoản ngân hàng">
-                                                                <h6>Chọn ngân hàng</h6>
-                                                            </label> <select class="form-control" id="ccmonth">
-                                                                <option value="" selected disabled>--Chọn ngân hàng của bạn--</option>
-                                                                <option>Vietinbank</option>
-                                                                <option>Vietcombank</option>
-                                                                <option>Techcombank</option>
-                                                                <option>Agribank</option>
-                                                            </select> </div>
-                                                        <div class="form-group">
-                                                            <p> <button type="button" class="btn btn-primary "><i class="fas fa-mobile-alt mr-2"></i>Tiến hành thanh toán</button> </p>
+                                                        <div class="col-12 col-md-12 mt-3">
+                                                            <div class="row">
+                                                                <div class="col-md-2 d-flex align-items-center p-0 justify-content-left">
+                                                                    <label for="phone" class="form-label mb-0">
+                                                                        Số điện thoại <span class="text-danger">*</span>
+                                                                    </label>
+                                                                </div>
+                                                            
+                                                                <div class="col-md-10 p-0">
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-text">
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-telephone" viewBox="0 0 16 16">
+                                                                                <path d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.568 17.568 0 0 0 4.168 6.608 17.569 17.569 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.678.678 0 0 0-.58-.122l-2.19.547a1.745 1.745 0 0 1-1.657-.459L5.482 8.062a1.745 1.745 0 0 1-.46-1.657l.548-2.19a.678.678 0 0 0-.122-.58L3.654 1.328zM1.884.511a1.745 1.745 0 0 1 2.612.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.678.678 0 0 0 .178.643l2.457 2.457a.678.678 0 0 0 .644.178l2.189-.547a1.745 1.745 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.634 18.634 0 0 1-7.01-4.42 18.634 18.634 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877L1.885.511z" />
+                                                                            </svg>
+                                                                        </span>
+                                                                        <input type="number" class="form-control" id="phone" name="phone" value="" required>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        <p class="text-muted">Lưu ý: Sau khi nhấp vào nút, bạn sẽ được chuyển đến cổng thanh toán bảo mật. Sau khi hoàn tất quá trình thanh toán, bạn sẽ được chuyển lại về trang web để xem chi tiết đơn hàng của mình.</p>
-                                                    </div> <!-- End -->
-                                                    <!-- End -->
-                                                </div>
+                                                        <div class="col-12 mt-5">
+                                                            <div class="d-grid">
+                                                                <button data-action="save" class="btn btn-primary btn-lg" type="submit">Hoàn Tất Đăng Ký</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
                             </div>
                         </form>
-                    `
+                    `;
+                }
+
+                initForm() {
+                    new CreateForm({
+                        container: $('[data-form="create-suggest"]')
+                    })
                 }
 
                 events() {
@@ -779,9 +901,11 @@
 
                         const url = this.getUrl();
 
-                        registerModal.setHeading("Thanh toán tên miền");
+                        registerModal.setHeading("Xác nhận");
                         registerModal.setBody(this.setupModalBody());
                         registerModal.show();
+                        
+                        this.initForm();
                     })
                 }
             }

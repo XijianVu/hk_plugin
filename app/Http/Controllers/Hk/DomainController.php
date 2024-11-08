@@ -5,6 +5,7 @@ namespace App\Http\Controllers\hk;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Helpers\Functions;
+use App\Models\Order;
 
 class DomainController extends Controller
 {
@@ -47,6 +48,25 @@ class DomainController extends Controller
 
         return response()->view('hk.domain.suggest_domains', [
             'domains' => $suggestDomains
+        ], 200);
+    }
+
+    public function saveOrder(Request $request)
+    {
+        $order = Order::newDefault();
+        $errors = $order->saveFromRequest($request);
+
+        if (!$errors->isEmpty()) {
+            return response()->json([
+                'status' => 400,
+                'message' => "Save order fail!",
+                'errors' => $errors
+            ], 400);
+        }
+
+        return response()->json([
+            'status' => 200,
+            'message' => "Save order successfully!",
         ], 200);
     }
 

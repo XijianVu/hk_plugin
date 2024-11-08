@@ -212,5 +212,19 @@ class Functions
 
         return $baseName . $randomSuffix . '.' . explode('.', $lastDomain)[1];
     }
+
+    public static function convertStringPriceToNumber($strPrice)
+    {
+        if (is_numeric($strPrice) && floatval($strPrice) > 0) {
+            return floatval($strPrice);
+        }
+
+        if (!is_string($strPrice)) return 0;
+
+        $cleanStr = str_replace(array(',', '.'), '', $strPrice);
+        $floatNum = floatval($cleanStr);
+
+        return $floatNum;
+    }
 }
 
