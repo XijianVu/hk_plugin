@@ -836,7 +836,7 @@
         <div class="col-md-4">
             <div class="card shadow-sm py-4 border-0 rounded">
                 <div class="card-body">
-                    <i class="bi bi-headset fs-1 text-primary"></i>
+                    {{-- <i class="bi bi-headset fs-1 text-primary"></i> --}}
                     <h3 class="fw-bold mt-3">Hỗ Trợ 24/7</h3>
                     <p class="text-muted">Đội ngũ của chúng tôi luôn sẵn sàng hỗ trợ bạn mọi lúc.</p>
                 </div>
@@ -845,7 +845,7 @@
         <div class="col-md-4">
             <div class="card shadow-sm py-4 border-0 rounded">
                 <div class="card-body">
-                    <i class="bi bi-gear fs-1 text-primary"></i>
+                    {{-- <i class="bi bi-gear fs-1 text-primary"></i> --}}
                     <h3 class="fw-bold mt-3">Quản Lý Dễ Dàng</h3>
                     <p class="text-muted">Quản lý tên miền với giao diện đơn giản và trực quan.</p>
                 </div>
@@ -854,7 +854,7 @@
         <div class="col-md-4 mx-auto" data-form="search-domain" data-url="">
             <div class="card shadow-sm py-4 border-0 rounded">
                 <div class="card-body">
-                    <i class="bi bi-patch-check fs-1 text-primary"></i>
+                    {{-- <i class="bi bi-patch-check fs-1 text-primary"></i> --}}
                     <h3 class="fw-bold mt-3">Cam Kết Chất Lượng</h3>
                     <p class="text-muted">Chúng tôi đảm bảo tên miền của bạn luôn hoạt động ổn định.</p>
                 </div>

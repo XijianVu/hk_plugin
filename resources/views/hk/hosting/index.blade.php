@@ -43,7 +43,7 @@
                     <h3 class="text-primary font-weight-bold">381.000₫</h3>
                     <p class="text-muted text-center">/tháng</p>
                     <small>Tiết kiệm 15% với gói hàng năm</small>
-                    <a href="#" class="btn btn-dark mt-3">Xem các gói</a>
+                    <a href="#" class="btn btn-dark mt-3">Đăng ký</a>
                 </div>
             </div>
         </div>
@@ -58,7 +58,7 @@
                     <h3 class="text-primary font-weight-bold">142.000₫</h3>
                     <p class="text-muted text-center">/tháng</p>
                     <small>Tiết kiệm 15% với gói hàng năm</small>
-                    <a href="#" class="btn btn-dark mt-3">Xem các gói</a>
+                    <a href="#" class="btn btn-dark mt-3">Đăng ký</a>
                 </div>
             </div>
         </div>
@@ -73,7 +73,7 @@
                     <h3 class="text-primary font-weight-bold">74.000₫</h3>
                     <p class="text-muted text-center">/tháng</p>
                     <small>Tiết kiệm 25% với gói hàng năm</small>
-                    <a href="#" class="btn btn-dark mt-3">Xem các gói</a>
+                    <a href="#" class="btn btn-dark mt-3">Đăng ký</a>
                 </div>
             </div>
         </div>
@@ -88,13 +88,13 @@
                     <h3 class="text-primary font-weight-bold">122.000₫</h3>
                     <p class="text-muted text-center">/tháng</p>
                     <small>Tiết kiệm 15% với gói hàng năm</small>
-                    <a href="#" class="btn btn-dark mt-3">Xem các gói</a>
+                    <a href="#" class="btn btn-dark mt-3">Đăng ký</a>
                 </div>
             </div>
         </div>
     </div>
     <div class="text-center">
-        <a href="#" class="btn btn-primary btn-lg font-weight-bold">Tôi Cần Tư Vấn</a>
+        <a href="#" class="btn btn-primary btn-lg font-weight-bold">Đăng ký</a>
     </div>
 </div>
 
