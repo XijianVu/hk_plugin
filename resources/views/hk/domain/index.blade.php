@@ -1003,9 +1003,13 @@
         <div class="col-md-12 mt-5">
             <div class="row d-flex justify-content-around">
                 @foreach (\App\Services\Domain\Domain::getPrices() as $key => $price)
-                    <button class="btn btn-outline-secondary text-dark fw-semibold col-md-2 mx-4 my-2 badge badge-info border-0 py-2">
-                        <span class="badge badge-info fw-bold" style="font-size: 15px">{{ $key }}</span>&nbsp;
-                        <span class="text-white badge badge-info fw-bold" style="font-size: 15px">{{ \App\Helpers\Functions::formatNumberToVnd($price) }} VND</span>
+                    <button class="btn btn-outline-secondary text-dark fw-semibold col-md-2 mx-4 my-2 badge badge-info border-0 py-2 d-flex flex-column align-items-center">
+                        <span class="badge badge-info fw-bold" style="font-size: 15px; white-space: nowrap; text-transform: none;">
+                            {{ $key }}
+                        </span>
+                        <span class="text-white badge badge-info fw-bold" style="font-size: 15px; white-space: nowrap;">
+                            {{ \App\Helpers\Functions::formatNumberToVnd($price) }} VNĐ
+                        </span>
                     </button>
                 @endforeach
             </div>
