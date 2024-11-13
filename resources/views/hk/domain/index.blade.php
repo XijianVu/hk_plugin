@@ -37,13 +37,6 @@
         box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
     }
 
-    /* .btn-success {
-        padding: 0.75rem 0;
-        font-size: 1.2rem;
-        font-weight: bold;
-        transition: background-color 0.3s ease, box-shadow 0.3s ease;
-    } */
-
     .btn-success:hover {
         background-color: #28a745cc;
         box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
@@ -285,7 +278,6 @@
                 },
 
                 warning: function(options) {
-
                     if (!options.icon) {
                         options.icon = 'warning'
                     }
@@ -470,6 +462,36 @@
 
                     return `
                         <form data-form="create-suggest" class="rounded shadow-sm overflow-hidden">
+                            <div data-form="spinner" class="d-none" style="
+                                position: absolute;
+                                width: 100%;
+                                height: 100%;
+                                left: 0;
+                                right: 0;
+                                top: 0;
+                                bottom: 0;
+                            ">
+                                <div style="
+                                            width: 100%;
+                                            height: 100%;
+                                            background: rgb(240 240 240 / 82%);
+                                            z-index: 998;
+                                            position: absolute;
+                                            left: 0;
+                                            right: 0;
+                                            top: 0;
+                                            bottom: 0;
+                                            "
+                                            ></div>
+                                <div class="spinner" style="
+                                        position: absolute;
+                                        top: 50%;
+                                        left: 50%;
+                                        transform: translate(-50%, -50%);
+                                        z-index: 999;
+                                ">
+                                </div>
+                            </div>
                             @csrf
                             <div class="d-flex justify-content-center align-items-center container">
                                 <div class="px-3">
@@ -746,9 +768,22 @@
                     return "{!! esc_url(get_site_url()) . '?page=hk&path=/hk/save-order' !!}";
                 }
 
+                getSpinnerForm() {
+                    return this.container.find('[data-form="spinner"]')
+                }
+
+                showSpinner() {
+                    this.getSpinnerForm().removeClass('d-none');;
+                }
+
+                hideSpinner() {
+                    this.getSpinnerForm().addClass('d-none');;
+                }
+
                 events() {
                     this.getSaveBtn().on('click', e => {
                         e.preventDefault();
+                        this.showSpinner();
 
                         const data = $(this.container).serialize();
 
@@ -757,6 +792,8 @@
                             method: 'POST',
                             data: data
                         }).done(res => {
+                            this.hideSpinner();
+
                             HKTool.alert({
                                 icon: 'success',
                                 message: "Tạo đơn thành công!",
@@ -765,6 +802,8 @@
                                 }
                             })
                         }).fail(res => {
+                            this.hideSpinner();
+
                             HKTool.alert({
                                 icon: 'error',
                                 message: "Tạo đơn thất bại, vui lòng kiểm tra lại!",
@@ -814,6 +853,36 @@
 
                     return `
                         <form data-form="create-suggest" class="rounded shadow-sm overflow-hidden">
+                            <div data-form="spinner" class="d-none" style="
+                                position: absolute;
+                                width: 100%;
+                                height: 100%;
+                                left: 0;
+                                right: 0;
+                                top: 0;
+                                bottom: 0;
+                            ">
+                                <div style="
+                                            width: 100%;
+                                            height: 100%;
+                                            background: rgb(240 240 240 / 82%);
+                                            z-index: 998;
+                                            position: absolute;
+                                            left: 0;
+                                            right: 0;
+                                            top: 0;
+                                            bottom: 0;
+                                            "
+                                            ></div>
+                                <div class="spinner" style="
+                                        position: absolute;
+                                        top: 50%;
+                                        left: 50%;
+                                        transform: translate(-50%, -50%);
+                                        z-index: 999;
+                                ">
+                                </div>
+                            </div>
                             @csrf
                             <div class="d-flex justify-content-center align-items-center container">
                                 <div class="px-3">
@@ -921,7 +990,7 @@
 
                         const url = this.getUrl();
 
-                        registerModal.setHeading("Xác nhận");
+                        registerModal.setHeading("Thanh toán tên miền");
                         registerModal.setBody(this.setupModalBody());
                         registerModal.show();
                         
