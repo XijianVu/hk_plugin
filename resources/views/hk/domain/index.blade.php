@@ -130,7 +130,7 @@
                         </div>
                 
                         <div class="col-md-3">
-                            <span data-control="available-domain-price">249.000 vnđ</span>
+                            <span data-control="available-domain-price"></span>
                         </div>
                 
                         <div class="col-md-3">
@@ -404,8 +404,9 @@
                     this.getInvalidForm().show();
                 }
 
-                handleValid(availableDomain) {
-                    this.setAvailableDomain(availableDomain);
+                handleValid(domain) {
+                    this.setAvailableDomain(domain.name);
+                    this.setAvailableDomainPrice(this.formatNumberToVnd(domain.price))
                     this.hideInvalidForm();
                     this.showValidForm();
                 }
@@ -414,6 +415,17 @@
                     this.setAvailableDomain(null);
                     this.hideValidForm();
                     this.showInValidForm();
+                }
+
+                formatNumberToVnd(number, decimals = 0) {
+                    if (Number.isInteger(number)) {
+                        decimals = 0;
+                    }
+
+                    return number.toLocaleString('en-US', {
+                        minimumFractionDigits: decimals,
+                        maximumFractionDigits: decimals
+                    });
                 }
 
                 formatPrice(priceString) {
@@ -425,6 +437,10 @@
 
                 getAvailabledDomainSpan() {
                     return this.container.find('[data-control="available-domain-name"]');
+                }
+
+                getAvailabledDomainPriceSpan() {
+                    return this.container.find('[data-control="available-domain-price"]');
                 }
 
                 getAvailableDomainName() {
@@ -439,8 +455,12 @@
                     return this.container.find('[data-action="by-available-domain"]');
                 }
 
-                setAvailableDomain(availableDomain) {
-                    this.getAvailabledDomainSpan().html(availableDomain);
+                setAvailableDomain(name) {
+                    this.getAvailabledDomainSpan().html(name);
+                }
+
+                setAvailableDomainPrice(price) {
+                    this.getAvailabledDomainPriceSpan().html(price + " VNĐ");
                 }
 
                 setupModalBody() {
@@ -616,7 +636,7 @@
                                 value: value
                             }
                         }).done(res => {
-                            this.validationBox.handleValid(value);
+                            this.validationBox.handleValid(res.domain);
                         }).fail(res => {
                             const errorText = JSON.parse(res.responseText).message;
                             this.validationBox.setErrorText(errorText)
@@ -942,7 +962,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mx-auto" data-form="search-domain" data-url="">
+        <div class="col-md-4 mx-auto">
             <div class="card shadow-sm py-4 border-0 rounded">
                 <div class="card-body">
                     {{-- <i class="bi bi-patch-check fs-1 text-primary"></i> --}}

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Helpers\Functions;
 use App\Models\Order;
+use App\Services\Domain\Domain;
 
 class DomainController extends Controller
 {
@@ -16,19 +17,17 @@ class DomainController extends Controller
 
     public function searchDomain(Request $request)
     {
-        // Trimming và kiểm tra tên miền
-        $domain = trim($request->input('value'));
+        $domainName = trim($request->input('value'));
+        $domain = Domain::newDefault($domainName);
     
-        if (!Functions::isValidDomainFormat($domain)) {
+        if (!$domain->isValidNameFormat()) {
             return response()->json([
                 'message' => "Tên miền chưa hợp lệ!",
                 'status' => 400
             ], 400);
         }
     
-        $isDomainAvailable = Functions::isDomainAvailable($domain);
-    
-        if (!$isDomainAvailable) {
+        if (!$domain->isAvailable()) {
             return response()->json([
                 'message' => "Domain đã tồn tại!",
                 'status' => 409 // Conflict
@@ -37,6 +36,7 @@ class DomainController extends Controller
     
         return response()->json([
             'message' => "Domain hợp lệ!",
+            'domain' => $domain,
             'status' => 200
         ], 200);
     }
