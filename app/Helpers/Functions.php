@@ -4,6 +4,7 @@ namespace App\Helpers;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use App\Services\Domain\Domain;
 
 class Functions 
 {
@@ -114,35 +115,78 @@ class Functions
         return self::generateDomainsBasedOnSearch($searchValue);
     }
 
+    public static function isDomainAvailableMulti($domains)
+    {
+        $multiCurl = curl_multi_init();
+        $curlHandles = [];
+
+        foreach ($domains as $domain) {
+            if (!preg_match("~^(?:f|ht)tps?://~i", $domain)) {
+                $domain = "http://" . $domain;
+            }
+
+            $ch = curl_init($domain);
+            curl_setopt($ch, CURLOPT_NOBODY, true);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            
+            curl_multi_add_handle($multiCurl, $ch);
+            $curlHandles[$domain] = $ch;
+        }
+
+        $running = null;
+
+        do {
+            curl_multi_exec($multiCurl, $running);
+            curl_multi_select($multiCurl);
+        } while ($running > 0);
+
+        $results = [];
+
+        foreach ($curlHandles as $domain => $ch) {
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $results[$domain] = !($httpCode >= 200 && $httpCode < 400);
+
+            curl_multi_remove_handle($multiCurl, $ch);
+            curl_close($ch);
+        }
+
+        curl_multi_close($multiCurl);
+        
+        return $results;
+    }
+
     private static function getAvailableDomains()
     {
         $suggestedDomains = [];
-        $maxAttempts = 20;  // Số lần thử tối đa để tìm tên miền hợp lệ
+        $maxAttempts = 20;
         $attempts = 0;
+        $domainCandidates = [];
 
         while (count($suggestedDomains) < self::MAX_SUGGEST && $attempts < $maxAttempts) {
-            $domainName = self::generateRandomDomain(self::WORDS_LIST, self::LTDS);
+            $domainCandidates[] = self::generateRandomDomain(self::WORDS_LIST, self::LTDS);
             $attempts++;
 
-            if (self::isDomainAvailable($domainName)) {
-                $suggestedDomains[] = [
-                    'name' => $domainName,
-                    'price' => '300000', // first year
-                    'discount_percent' => 20
-                ];
+            if (count($domainCandidates) >= self::MAX_SUGGEST) {
+                $availabilityResults = self::isDomainAvailableMulti($domainCandidates);
+
+                foreach ($availabilityResults as $domain => $isAvailable) {
+                    if ($isAvailable) {
+                        $suggestedDomains[] = Domain::newDefault($domain);
+                    }
+                    if (count($suggestedDomains) >= self::MAX_SUGGEST) {
+                        break;
+                    }
+                }
+                $domainCandidates = [];
             }
         }
 
-        // Nếu không đủ 4 domain, thử thêm hậu tố vào các domain đã có
         while (count($suggestedDomains) < self::MAX_SUGGEST) {
             $newDomain = self::addSuffixToDomain($suggestedDomains);
-
             if (self::isDomainAvailable($newDomain)) {
-                $suggestedDomains[] = [
-                    'name' => $newDomain,
-                    'price' => '300000', // first year
-                    'discount_percent' => 20
-                ];
+                $suggestedDomains[] = Domain::newDefault($newDomain);
             }
         }
 
@@ -176,11 +220,7 @@ class Functions
 
             // Kiểm tra nếu tên miền gợi ý không trùng với searchValue và tên miền có thể đăng ký
             if ($newDomain !== $searchValue && self::isDomainAvailable($newDomain)) {
-                $suggestedDomains[] = [
-                    'name' => $newDomain,
-                    'price' => '300000', // first year
-                    'discount_percent' => 20
-                ];
+                $suggestedDomains[] = Domain::newDefault($newDomain);
             }
 
             // Dừng lại nếu đã tìm được đủ 4 domain
@@ -193,11 +233,7 @@ class Functions
         while (count($suggestedDomains) < self::MAX_SUGGEST) {
             $newDomain = self::addSuffixToDomain($suggestedDomains);
             if (self::isDomainAvailable($newDomain)) {
-                $suggestedDomains[] = [
-                    'name' => $newDomain,
-                    'price' => '300000', // first year
-                    'discount_percent' => 20
-                ];
+                $suggestedDomains[] = Domain::newDefault($newDomain);
             }
         }
 
@@ -206,7 +242,7 @@ class Functions
 
     private static function addSuffixToDomain($suggestedDomains)
     {
-        $lastDomain = $suggestedDomains[count($suggestedDomains) - 1]['name'];
+        $lastDomain = $suggestedDomains[count($suggestedDomains) - 1]->name;
         $baseName = explode('.', $lastDomain)[0];
         $randomSuffix = self::SUGGEST_SUFFIX[array_rand(self::SUGGEST_SUFFIX)];
 
@@ -215,7 +251,7 @@ class Functions
 
     public static function convertStringPriceToNumber($strPrice)
     {
-        if (is_numeric($strPrice) && floatval($strPrice) > 0) {
+        if (is_numeric($strPrice) && floatval($strPrice) > 0) { 
             return floatval($strPrice);
         }
 
@@ -225,6 +261,17 @@ class Functions
         $floatNum = floatval($cleanStr);
 
         return $floatNum;
+    }
+
+    public static function formatNumberToVnd($number, $decimals = 0)
+    {
+        // Check if the number is already rounded to 0 decimal places
+        if ($number == round($number)) {
+            // The number is already rounded
+            $decimals = 0;
+        }
+
+        return number_format($number, $decimals, ".", ",");
     }
 }
 
