@@ -913,45 +913,12 @@
 
         <div class="col-md-12 mt-5">
             <div class="row d-flex justify-content-around">
-                <button class="btn btn-outline-secondary text-dark fw-semibold col-md-2 mx-4 my-2 badge badge-info border-0 py-2">
-                    <span class="badge badge-info fw-bold" style="font-size: 15px">.vn</span>&nbsp;
-                    <span class="text-white badge badge-info fw-bold" style="font-size: 15px">500.000 VND</span>
-                </button>
-
-                <button class="btn btn-outline-secondary text-dark fw-semibold col-md-2 mx-4 my-2 badge badge-info border-0 py-2">
-                    <span class="badge badge-info fw-bold" style="font-size: 15px">.com</span>&nbsp;
-                    <span class="text-white badge badge-info fw-bold" style="font-size: 15px">500.000 VND</span>
-                </button>
-
-                <button class="btn btn-outline-secondary text-dark fw-semibold col-md-2 mx-4 my-2 badge badge-info border-0 py-2">
-                    <span class="badge badge-info fw-bold" style="font-size: 15px">.net</span>&nbsp;
-                    <span class="text-white badge badge-info fw-bold" style="font-size: 15px">500.000 VND</span>
-                </button>
-
-                <button class="btn btn-outline-secondary text-dark fw-semibold col-md-2 mx-4 my-2 badge badge-info border-0 py-2">
-                    <span class="badge badge-info fw-bold" style="font-size: 15px">.org</span>&nbsp;
-                    <span class="text-white badge badge-info fw-bold" style="font-size: 15px">500.000 VND</span>
-                </button>
-
-                <button class="btn btn-outline-secondary text-dark fw-semibold col-md-2 mx-4 my-2 badge badge-info border-0 py-2">
-                    <span class="badge badge-info fw-bold" style="font-size: 15px">.edu</span>&nbsp;
-                    <span class="text-white badge badge-info fw-bold" style="font-size: 15px">500.000 VND</span>
-                </button>
-
-                <button class="btn btn-outline-secondary text-dark fw-semibold col-md-2 mx-4 my-2 badge badge-info border-0 py-2">
-                    <span class="badge badge-info fw-bold" style="font-size: 15px">.au</span>&nbsp;
-                    <span class="text-white badge badge-info fw-bold" style="font-size: 15px">500.000 VND</span>
-                </button>
-
-                <button class="btn btn-outline-secondary text-dark fw-semibold col-md-2 mx-4 my-2 badge badge-info border-0 py-2">
-                    <span class="badge badge-info fw-bold" style="font-size: 15px">.ha</span>&nbsp;
-                    <span class="text-white badge badge-info fw-bold" style="font-size: 15px">500.000 VND</span>
-                </button>
-
-                <button class="btn btn-outline-secondary text-dark fw-semibold col-md-2 mx-4 my-2 badge badge-info border-0 py-2">
-                    <span class="badge badge-info fw-bold" style="font-size: 15px">.us</span>&nbsp;
-                    <span class="text-white badge badge-info fw-bold" style="font-size: 15px">500.000 VND</span>
-                </button>
+                @foreach (\App\Services\Domain\Domain::getPrices() as $key => $price)
+                    <button class="btn btn-outline-secondary text-dark fw-semibold col-md-2 mx-4 my-2 badge badge-info border-0 py-2">
+                        <span class="badge badge-info fw-bold" style="font-size: 15px">{{ $key }}</span>&nbsp;
+                        <span class="text-white badge badge-info fw-bold" style="font-size: 15px">{{ \App\Helpers\Functions::formatNumberToVnd($price) }} VND</span>
+                    </button>
+                @endforeach
             </div>
         </div>
     </div>

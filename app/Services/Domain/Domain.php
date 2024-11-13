@@ -25,6 +25,24 @@ class Domain {
         '.cc' => 900000,
     ];
 
+    protected const PRICES_MAP = [
+        '.net' => 350000,
+        '.com' => 300000,
+        '.org' => 450000,
+        '.vn' => 700000,
+        '.store' => 500000,
+        '.one' => 800000,
+        '.pics' => 780000,
+        '.cloud' => 900000,
+        '.asis' => 400000,
+        '.monster' => 560000,
+        '.group' => 590000,
+        '.info' => 480000,
+        '.help' => 340000,
+        '.xyz' => 800000,
+        '.cc' => 900000,
+    ];
+
     protected $discountsMap = [
         '.net' => 12,
         '.com' => 5,
@@ -50,10 +68,16 @@ class Domain {
         $newDomain->name = $name;
 
         $suffix = $newDomain->getSuffix($name);
+
         $newDomain->price = $newDomain->getPriceFromSuffix($suffix);
         $newDomain->discount = $newDomain->getDiscountPercentBySuffix($suffix);
 
         return $newDomain;
+    }
+
+    public static function getPrices()
+    {
+        return self::PRICES_MAP;
     }
 
     private function getSuffix($domain) {
