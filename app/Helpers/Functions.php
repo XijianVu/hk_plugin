@@ -9,11 +9,14 @@ use App\Services\Domain\Domain;
 class Functions 
 {
     private const MAX_SUGGEST = 6;
+    
     private const LTDS = [
-        '.net',
-        '.com',
-        '.org',
+        '.com',       // Ưu tiên cao nhất
+        '.com.vn',    // Thứ tự ưu tiên tiếp theo
         '.vn',
+        '.info',
+        '.org',
+        '.net',
         '.store',
         '.one',
         '.pics',
@@ -21,7 +24,6 @@ class Functions
         '.asis',
         '.monster',
         '.group',
-        '.info',
         '.help',
         '.xyz',
         '.cc'
@@ -120,30 +122,38 @@ class Functions
         $multiCurl = curl_multi_init();
         $curlHandles = [];
 
+        // Thiết lập các phiên curl
         foreach ($domains as $domain) {
-            if (!preg_match("~^(?:f|ht)tps?://~i", $domain)) {
-                $domain = "http://" . $domain;
-            }
+            $domain = (preg_match("~^(?:f|ht)tps?://~i", $domain)) ? $domain : "http://" . $domain;
 
-            $ch = curl_init($domain);
-            curl_setopt($ch, CURLOPT_NOBODY, true);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-            
+            $ch = curl_init();
+            curl_setopt_array($ch, [
+                CURLOPT_URL => $domain,
+                CURLOPT_NOBODY => true,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_TIMEOUT_MS => 5000, // Giảm thời gian timeout xuống còn 5 giây
+                CURLOPT_FOLLOWLOCATION => true,
+            ]);
+
             curl_multi_add_handle($multiCurl, $ch);
             $curlHandles[$domain] = $ch;
         }
 
         $running = null;
 
+        // Thực hiện các yêu cầu song song
         do {
-            curl_multi_exec($multiCurl, $running);
-            curl_multi_select($multiCurl);
-        } while ($running > 0);
+            $status = curl_multi_exec($multiCurl, $running);
+            if ($status > 0) {
+                break; // Nếu có lỗi, thoát sớm
+            }
+            // Tránh block bởi curl_multi_select
+            while (curl_multi_select($multiCurl, 0.1) === 0);
+        } while ($running);
 
         $results = [];
 
+        // Lấy kết quả từ từng yêu cầu
         foreach ($curlHandles as $domain => $ch) {
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             $results[$domain] = !($httpCode >= 200 && $httpCode < 400);
@@ -153,7 +163,7 @@ class Functions
         }
 
         curl_multi_close($multiCurl);
-        
+
         return $results;
     }
 
@@ -161,36 +171,47 @@ class Functions
     {
         $suggestedDomains = [];
         $maxAttempts = 20;
-        $attempts = 0;
-        $domainCandidates = [];
+        $batchSize = 30; // Tăng số lượng domain kiểm tra mỗi batch
+        $checkedDomains = [];
 
-        while (count($suggestedDomains) < self::MAX_SUGGEST && $attempts < $maxAttempts) {
-            $domainCandidates[] = self::generateRandomDomain(self::WORDS_LIST, self::LTDS);
-            $attempts++;
+        for ($attempts = 0; $attempts < $maxAttempts && count($suggestedDomains) < self::MAX_SUGGEST; $attempts++) {
+            // Sinh batch domain
+            $domainCandidates = array_unique(array_map(
+                fn() => self::generateRandomDomain(self::WORDS_LIST, self::LTDS),
+                range(1, $batchSize)
+            ));
 
-            if (count($domainCandidates) >= self::MAX_SUGGEST) {
-                $availabilityResults = self::isDomainAvailableMulti($domainCandidates);
+            // Loại bỏ domain đã kiểm tra trước đó
+            $domainCandidates = array_diff($domainCandidates, $checkedDomains);
+            $checkedDomains = array_merge($checkedDomains, $domainCandidates);
 
-                foreach ($availabilityResults as $domain => $isAvailable) {
-                    if ($isAvailable) {
-                        $suggestedDomains[] = Domain::newDefault($domain);
-                    }
+            // Kiểm tra khả dụng với DNS lookup
+            foreach ($domainCandidates as $domain) {
+                if (self::isDomainAvailableByDNS($domain)) {
+                    $suggestedDomains[] = Domain::newDefault($domain);
                     if (count($suggestedDomains) >= self::MAX_SUGGEST) {
-                        break;
+                        return $suggestedDomains; // Đạt số lượng yêu cầu, thoát sớm
                     }
                 }
-                $domainCandidates = [];
             }
         }
 
+        // Nếu chưa đủ, thêm domain bằng hậu tố
         while (count($suggestedDomains) < self::MAX_SUGGEST) {
             $newDomain = self::addSuffixToDomain($suggestedDomains);
-            if (self::isDomainAvailable($newDomain)) {
+            if (!in_array($newDomain, $checkedDomains) && self::isDomainAvailableByDNS($newDomain)) {
                 $suggestedDomains[] = Domain::newDefault($newDomain);
+                $checkedDomains[] = $newDomain;
             }
         }
 
         return $suggestedDomains;
+    }
+
+    private static function isDomainAvailableByDNS($domain): bool
+    {
+        // Chỉ kiểm tra các bản ghi A hoặc MX của domain
+        return !checkdnsrr($domain, 'A') && !checkdnsrr($domain, 'MX');
     }
 
     private static function generateRandomDomain($wordList, $tlds)
