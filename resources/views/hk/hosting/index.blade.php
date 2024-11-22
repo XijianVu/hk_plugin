@@ -58,7 +58,7 @@
             </div>
             <div class="col-md-6">
                 <div class="text-center">
-                    <img src="<?php echo home_url(); ?>/wp-content/uploads/2024/10/hosting.jpg" alt="Image" class="img-fluid rounded shadow-lg">
+                    <img src="<?php echo home_url(); ?>/wp-content/uploads/2024/11/Screenshot-2024-11-06-at-15.58.28.png" alt="Image" class="img-fluid rounded shadow-lg">
 
 
                 </div>
